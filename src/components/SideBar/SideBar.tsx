@@ -87,21 +87,24 @@ export default function SideBar() {
       <div
         className={`fixed left-0 top-0 z-10 h-screen max-w-[320px] space-y-12 overflow-y-auto bg-[#FFEFE5] p-3 transition-all md:relative ${active ? "w-full translate-x-0" : "w-[0%] -translate-x-full"}`}
       >
-        <div className="relative flex flex-col gap-y-2 *:py-2">
+        <div className="flex flex-col gap-y-2 *:py-2">
           <div className="h-10" />
-          <button className="flex items-center gap-x-2">
-            <svg
-              className="h-6 w-6 fill-[#DC4C3E]"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 512 512"
-            >
-              Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com
-              License - https://fontawesome.com/license/free Copyright 2025
-              Fonticons, Inc.
-              <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
-            </svg>
-            <span>Add Task</span>
-          </button>
+          <div className="relative">
+            <button className="flex items-center gap-x-2">
+              <svg
+                className="h-6 w-6 fill-[#DC4C3E]"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+              >
+                Font Awesome Free 6.7.2 by @fontawesome -
+                https://fontawesome.com License -
+                https://fontawesome.com/license/free Copyright 2025 Fonticons,
+                Inc.
+                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z" />
+              </svg>
+              <span>Add Task</span>
+            </button>
+          </div>
           <button className="flex items-center gap-x-2">
             <svg
               className="h-6 w-6"

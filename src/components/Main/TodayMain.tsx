@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDatabase } from "../../hooks/useDatabase";
 import { QueryExecResult } from "sql.js";
 import TaskComponent from "./TaskComponent";
+import ViewPopup from "../PopUps/ViewPopup";
+import useClickAway from "../../hooks/useClickAway";
 
 // Seralize data to be used by sql
 const todaysDate = new Date().toLocaleDateString();
@@ -13,10 +15,10 @@ const uiDate = formattedDate.toDateString().split(" ");
 
 export default function TodayMain() {
   const { db } = useDatabase();
-  const [todaysTasks, setTodaysTasks] = useState<QueryExecResult[] | undefined>(
-    undefined,
-  );
+  const viewRef = useRef<HTMLDivElement>(null);
+  const [todaysTasks, setTodaysTasks] = useState<QueryExecResult[]>([]);
   const [view, setView] = useState<"list" | "board">("board");
+  const [openView, setOpenView] = useState(true);
 
   // Get all tasks that are for today and display it
   useEffect(() => {
@@ -32,12 +34,19 @@ export default function TodayMain() {
     }
   }, [db]);
 
+  useClickAway(viewRef, () => {
+    setOpenView(false);
+  });
+
   return (
     <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pt-12 md:px-8">
       <div className="absolute right-0 top-0 z-[5] px-2 py-2 md:px-0">
         <button
-          className="flex items-center gap-x-2 py-1 pl-2 md:pr-8"
-          onClick={() => setView(view === "list" ? "board" : "list")}
+          className="relative flex items-center gap-x-2 py-1 pl-2 md:pr-8"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenView(!openView);
+          }}
         >
           <svg
             className="h-5 w-5"
@@ -51,6 +60,13 @@ export default function TodayMain() {
           </svg>
           <span>View</span>
         </button>
+        {openView && (
+          <ViewPopup
+            ref={viewRef}
+            list={() => setView("list")}
+            board={() => setView("board")}
+          />
+        )}
       </div>
       {view === "list" ? (
         <div className="mx-auto w-full space-y-2 md:max-w-screen-md">
@@ -69,10 +85,12 @@ export default function TodayMain() {
                   Inc.
                   <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z" />
                 </svg>
-                <span>{todaysTasks && todaysTasks[0].values.length} tasks</span>
+                <span>
+                  {todaysTasks.length > 0 && todaysTasks[0].values.length} tasks
+                </span>
               </div>
             </div>
-            {todaysTasks &&
+            {todaysTasks.length > 0 &&
               todaysTasks[0].values.map((task) => {
                 return (
                   <TaskComponent
@@ -115,17 +133,19 @@ export default function TodayMain() {
                 Inc.
                 <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z" />
               </svg>
-              <span>{todaysTasks && todaysTasks[0].values.length} tasks</span>
+              <span>
+                {todaysTasks.length > 0 && todaysTasks[0].values.length} tasks
+              </span>
             </div>
           </div>
           <div className="space-y-4">
             <p className="font-bold">
               {uiDate[1]} {uiDate[2]} - Today{" "}
               <span className="font-normal text-neutral-500">
-                {todaysTasks && todaysTasks[0].values.length}
+                {todaysTasks.length > 0 && todaysTasks[0].values.length}
               </span>
             </p>
-            {todaysTasks &&
+            {todaysTasks.length > 0 &&
               todaysTasks[0].values.map((task) => {
                 return (
                   <TaskComponent
