@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 type ClickAwayCallback = (event: Event) => void;
 
 function useClickAway<T extends HTMLElement>(
   ref: React.RefObject<T>,
-  callback: ClickAwayCallback
+  callback: ClickAwayCallback,
 ): void {
   useEffect(() => {
     function handleClick(event: Event) {
@@ -12,12 +12,10 @@ function useClickAway<T extends HTMLElement>(
         callback(event);
       }
     }
-    document.addEventListener('click', handleClick);
-    document.addEventListener('touchstart', handleClick);
+    document.addEventListener("click", handleClick);
 
     return () => {
-      document.removeEventListener('click', handleClick);
-      document.removeEventListener('touchstart', handleClick);
+      document.removeEventListener("click", handleClick);
     };
   }, [ref, callback]);
 }

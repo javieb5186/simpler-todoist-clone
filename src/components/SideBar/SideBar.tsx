@@ -4,9 +4,11 @@ import { SqlValue } from "sql.js";
 import saveDatabaseToLocalStorage from "../../utils/saveDatabaseToLocalStorage";
 import useWindowWidth from "../../hooks/useWindowWidth";
 import CategoryButton from "./CategoryButton";
+import { useModal } from "../../contexts/useModalContext";
 
 export default function SideBar() {
   const { db } = useDatabase();
+  const [modal, setModal] = useModal();
   const width = useWindowWidth();
   const categoryRef = useRef<HTMLInputElement | null>(null);
   const [active, setActive] = useState(true);
@@ -90,7 +92,10 @@ export default function SideBar() {
         <div className="flex flex-col gap-y-2 *:py-2">
           <div className="h-10" />
           <div className="relative">
-            <button className="flex items-center gap-x-2">
+            <button
+              className="flex items-center gap-x-2"
+              onClick={() => setModal({ ...modal, addTask: true })}
+            >
               <svg
                 className="h-6 w-6 fill-[#DC4C3E]"
                 xmlns="http://www.w3.org/2000/svg"
@@ -105,7 +110,10 @@ export default function SideBar() {
               <span>Add Task</span>
             </button>
           </div>
-          <button className="flex items-center gap-x-2">
+          <button
+            className="flex items-center gap-x-2"
+            onClick={() => setModal({ ...modal, search: true })}
+          >
             <svg
               className="h-6 w-6"
               xmlns="http://www.w3.org/2000/svg"

@@ -14,7 +14,7 @@ const isoDate = formattedDate.toISOString().slice(0, 10);
 const uiDate = formattedDate.toDateString().split(" ");
 
 export default function TodayMain() {
-  const { db } = useDatabase();
+  const { db, fetch } = useDatabase();
   const viewRef = useRef<HTMLDivElement>(null);
   const [todaysTasks, setTodaysTasks] = useState<QueryExecResult[]>([]);
   const [view, setView] = useState<"list" | "board">("board");
@@ -32,14 +32,14 @@ export default function TodayMain() {
     } catch (error) {
       if (error) console.log(error);
     }
-  }, [db]);
+  }, [db, fetch]);
 
   useClickAway(viewRef, () => {
     setOpenView(false);
   });
 
   return (
-    <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pt-12 md:px-8">
+    <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pb-4 pt-12 md:px-8">
       <div className="absolute right-0 top-0 z-[5] px-2 py-2 md:px-0">
         <button
           className="relative flex items-center gap-x-2 py-1 pl-2 md:pr-8"
