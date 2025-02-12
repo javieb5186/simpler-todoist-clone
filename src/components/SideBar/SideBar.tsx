@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { Dispatch, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useDatabase } from "../../hooks/useDatabase";
 import { SqlValue } from "sql.js";
 import saveDatabaseToLocalStorage from "../../utils/saveDatabaseToLocalStorage";
@@ -6,7 +6,27 @@ import useWindowWidth from "../../hooks/useWindowWidth";
 import CategoryButton from "./CategoryButton";
 import { useModal } from "../../contexts/useModalContext";
 
-export default function SideBar() {
+const reset = {
+  today: false,
+  upcoming: false,
+  completed: false,
+  overdue: false,
+  category: "",
+};
+
+interface Props {
+  setState: Dispatch<
+    React.SetStateAction<{
+      today: boolean;
+      upcoming: boolean;
+      completed: boolean;
+      overdue: boolean;
+      category: string;
+    }>
+  >;
+}
+
+export default function SideBar({ setState }: Props) {
   const { db } = useDatabase();
   const [modal, setModal] = useModal();
   const width = useWindowWidth();
@@ -126,7 +146,10 @@ export default function SideBar() {
             </svg>
             <span>Search</span>
           </button>
-          <button className="flex items-center gap-x-2">
+          <button
+            className="flex items-center gap-x-2"
+            onClick={() => setState({ ...reset, today: true })}
+          >
             <svg
               className="h-6 w-6"
               xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +162,10 @@ export default function SideBar() {
             </svg>
             <span>Today</span>
           </button>
-          <button className="flex items-center gap-x-2">
+          <button
+            className="flex items-center gap-x-2"
+            onClick={() => setState({ ...reset, upcoming: true })}
+          >
             <svg
               className="h-6 w-6"
               xmlns="http://www.w3.org/2000/svg"
@@ -152,7 +178,10 @@ export default function SideBar() {
             </svg>
             <span>Upcoming</span>
           </button>
-          <button className="flex items-center gap-x-2">
+          <button
+            className="flex items-center gap-x-2"
+            onClick={() => setState({ ...reset, completed: true })}
+          >
             <svg
               className="h-6 w-6"
               xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +198,15 @@ export default function SideBar() {
         <div className="flex flex-col gap-y-2 *:text-left">
           <h2 className="pb-2 text-xl font-medium">My Categories</h2>
           {categories?.map((category, index) => {
-            return <CategoryButton key={index} category={category} />;
+            return (
+              <CategoryButton
+                key={index}
+                category={category}
+                onClick={() =>
+                  setState({ ...reset, category: String(category) })
+                }
+              />
+            );
           })}
           <div className="flex items-center gap-x-1">
             <label htmlFor="add-category">

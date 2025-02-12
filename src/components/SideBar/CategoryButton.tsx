@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 
 interface CategoryButtonProps {
   category: SqlValue;
+  onClick: () => void;
 }
 
-const CategoryButton = ({ category }: CategoryButtonProps) => {
+const CategoryButton = ({ category, onClick }: CategoryButtonProps) => {
   const { db } = useDatabase();
   const [counter, setCounter] = useState(0);
 
@@ -25,7 +26,11 @@ const CategoryButton = ({ category }: CategoryButtonProps) => {
   }, [category, db]);
 
   return (
-    <button key={String(category)} className="flex justify-between py-2">
+    <button
+      key={String(category)}
+      className="flex justify-between py-2"
+      onClick={onClick}
+    >
       <span>
         {String(category)[0].toUpperCase() + String(category).slice(1)}
       </span>
