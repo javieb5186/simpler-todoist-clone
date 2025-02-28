@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import TaskComponent from "./TaskComponent";
 import { QueryExecResult } from "sql.js";
 import { useDatabase } from "../../hooks/useDatabase";
@@ -9,15 +9,76 @@ interface Props {
   view: "list" | "board";
 }
 
-const currentDate = new Date();
-const currentISODate = currentDate.toISOString().slice(0, 10);
+interface SelectedWeek {
+  weekDays: number[];
+  month: number;
+  year: number;
+  prevMonth: boolean;
+  nextMonth: boolean;
+  otherDays: number;
+}
+
 const cal = calendar();
-const todaysDate = new Date();
-const localeDate = todaysDate.toLocaleDateString();
-const extractedDate = localeDate.split("/");
-const currentMonth = Number(extractedDate[0]);
-const currentDay = Number(extractedDate[1]);
-const currentYear = Number(extractedDate[2]);
+
+interface RenderTasks {
+  tasks: QueryExecResult[];
+  selectedWeek: SelectedWeek;
+}
+
+function RenderTasksToDays({ tasks, selectedWeek }: RenderTasks) {
+  const week = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  return (
+    <div className="grid grid-cols-7 gap-x-2 *:justify-center">
+      {week.map((day, index) => {
+        return (
+          <div key={day} className="space-y-4">
+            <div className="flex gap-x-2">
+              <span>{day}</span>
+              <span>{selectedWeek.weekDays[index]}</span>
+            </div>
+            {tasks.map((task) => {
+              const thisDayTask = task.values.filter((taskData) => {
+                return (
+                  Number(String(taskData[3]).split("-")[2]) ===
+                  selectedWeek.weekDays[index]
+                );
+              });
+
+              if (thisDayTask) {
+                return (
+                  <Fragment key={String(thisDayTask[0])}>
+                    {thisDayTask.map((task) => {
+                      return (
+                        <TaskComponent
+                          key={String(task[0])}
+                          title={String(task[1])}
+                          description={String(task[2])}
+                          id={Number(task[5])}
+                          view="board"
+                        />
+                      );
+                    })}
+                  </Fragment>
+                );
+              } else {
+                return <></>;
+              }
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Upcoming({ view }: Props) {
   const { db } = useDatabase();
@@ -26,23 +87,129 @@ export default function Upcoming({ view }: Props) {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toLocaleDateString().split("/"),
   );
+  const [selectedWeek, setSelectedWeek] = useState<SelectedWeek>();
 
+  // Initial instance of cal creates the selected week.
+  // Which defaults to today
   useEffect(() => {
-    try {
+    const selectedYear = Number(selectedDate[2]);
+    const selectedMonth = Number(selectedDate[0]);
+    const selectedDay = Number(selectedDate[1]);
+    const data = cal.of(selectedYear, selectedMonth - 1);
+    let week = data.calendar
+      .filter((week) => week.includes(selectedDay))
+      .flat();
+
+    // Check if a previous or next month is in calendarjs
+    let hasZeros = week.some((value) => value === 0);
+    let prev = false;
+    let next = false;
+    let length = 0;
+
+    if (hasZeros) {
+      const filteredWeek = week.filter((day) => day !== 0);
+      length = week.filter((day) => day === 0).length;
+
+      // Check if the 0 are at the beginning or end of the selected week
+      // Also check if its the next year or last year
+      if (week[0] === 0) {
+        prev = true;
+        let newMonth = selectedMonth - 2;
+        let newYear = selectedYear;
+        if (newMonth < 0) {
+          newMonth = 11 - Math.abs(selectedMonth - 2);
+          newYear--;
+        }
+        const prevCal = cal.of(newYear, newMonth);
+        const prevWeek = prevCal.calendar[0];
+        const filteredPrevWeek = prevWeek.filter((day) => day !== 0);
+        week = [filteredPrevWeek, filteredWeek].flat();
+      } else if (week[week.length - 1] === 0) {
+        next = true;
+        let newMonth = selectedMonth;
+        let newYear = selectedYear;
+        if (newMonth > 11) {
+          newMonth = 0 + selectedMonth;
+          newYear++;
+        }
+        const nextCal = cal.of(newYear, newMonth);
+        const nextWeek = nextCal.calendar[0];
+        const filteredNextWeek = nextWeek.filter((day) => day !== 0);
+        week = [filteredWeek, filteredNextWeek].flat();
+      }
+    }
+
+    setSelectedWeek({
+      weekDays: week,
+      month: selectedMonth - 1,
+      year: selectedYear,
+      prevMonth: prev,
+      nextMonth: next,
+      otherDays: length,
+    });
+  }, [cal, selectedDate]);
+
+  // Get all tasks from between the start and end date
+  useEffect(() => {
+    if (selectedWeek) {
+      const filteredWeek = selectedWeek.weekDays.filter((days) => days !== 0);
+      const startDay = String(filteredWeek[0]);
+      const lastDay = String(filteredWeek[filteredWeek.length - 1]);
+      const startISODate = new Date(
+        `${selectedWeek.year}-${String(selectedWeek.month + 1).padStart(2, "0")}-${startDay.padStart(2, "0")}`,
+      )
+        .toISOString()
+        .slice(0, 10);
+      const endISODate = new Date(
+        `${selectedWeek.year}-${String(selectedWeek.month + 1).padStart(2, "0")}-${lastDay.padStart(2, "0")}`,
+      )
+        .toISOString()
+        .slice(0, 10);
+
+      let results;
+
       if (db) {
-        const results = db.exec("SELECT * FROM tasks WHERE set_date > $date", {
-          $date: currentISODate,
-        });
+        if (selectedWeek.nextMonth) {
+          const endISODate = new Date(
+            `${selectedWeek.year}-${String(selectedWeek.month + 2).padStart(2, "0")}-${selectedWeek.otherDays}`,
+          )
+            .toISOString()
+            .slice(0, 10);
+
+          results = db.exec(
+            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate",
+            {
+              $startDate: startISODate,
+              $endDate: endISODate,
+            },
+          );
+        } else if (selectedWeek.prevMonth) {
+          const startISODate = new Date(
+            `${selectedWeek.year}-${String(selectedWeek.month).padStart(2, "0")}-${selectedWeek.otherDays}`,
+          )
+            .toISOString()
+            .slice(0, 10);
+
+          results = db.exec(
+            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate",
+            {
+              $startDate: startISODate,
+              $endDate: endISODate,
+            },
+          );
+        } else {
+          results = db.exec(
+            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate",
+            {
+              $startDate: startISODate,
+              $endDate: endISODate,
+            },
+          );
+        }
         setUpcomingTasks(results);
       }
-    } catch (error) {
-      if (error) console.log(error);
     }
-  }, [db]);
-
-  useEffect(() => {
-    console.log(calendar);
-  }, [calendar]);
+  }, [selectedWeek]);
 
   return (
     <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pb-4 pt-12 md:px-8">
@@ -89,18 +256,6 @@ export default function Upcoming({ view }: Props) {
                 </span>
               </div>
             </div>
-            {upcomingTasks.length > 0 &&
-              upcomingTasks[0].values.map((task) => {
-                return (
-                  <TaskComponent
-                    key={String(task[1])}
-                    title={String(task[1])}
-                    description={String(task[2])}
-                    id={Number(task[5])}
-                    view="list"
-                  />
-                );
-              })}
           </div>
           <button className="flex items-center gap-x-2 py-2 pr-4">
             <svg
@@ -127,8 +282,18 @@ export default function Upcoming({ view }: Props) {
                 setCalendarPopUp(!calendarPopUp);
               }}
             >
-              <span>month</span>
-              <span>year</span>
+              <span>
+                {
+                  cal.of(Number(selectedDate[2]), Number(selectedDate[0]) - 1)
+                    .month
+                }
+              </span>
+              <span>
+                {
+                  cal.of(Number(selectedDate[2]), Number(selectedDate[0]) - 1)
+                    .year
+                }
+              </span>
               <svg
                 className="h-4 w-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -145,23 +310,34 @@ export default function Upcoming({ view }: Props) {
               <CalendarPopup
                 selectedDate={selectedDate}
                 setSelectedDate={setSelectedDate}
+                callBack={() => {
+                  setCalendarPopUp(false);
+                }}
               />
             )}
           </div>
-          <div className="space-y-4">
-            {upcomingTasks.length > 0 &&
-              upcomingTasks[0].values.map((task) => {
-                return (
-                  <TaskComponent
-                    key={String(task[1])}
-                    title={String(task[1])}
-                    description={String(task[2])}
-                    id={Number(task[5])}
-                    view="board"
-                  />
-                );
-              })}
-          </div>
+          {selectedWeek && (
+            <RenderTasksToDays
+              tasks={upcomingTasks}
+              selectedWeek={selectedWeek}
+            />
+          )}
+          {/* <div className="grid grid-cols-7 gap-x-2">
+            <div className="space-y-4">
+              {upcomingTasks.length > 0 &&
+                upcomingTasks[0].values.map((task) => {
+                  return (
+                    <TaskComponent
+                      key={String(task[1])}
+                      title={String(task[1])}
+                      description={String(task[2])}
+                      id={Number(task[5])}
+                      view="board"
+                    />
+                  );
+                })}
+            </div>
+          </div> */}
         </div>
       )}
     </div>

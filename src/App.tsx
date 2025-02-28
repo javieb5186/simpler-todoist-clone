@@ -30,7 +30,7 @@ const ModalChild = () => {
         {main.category.length > 0 && (
           <Category category={main.category} view={"list"} />
         )}
-        {main.upcoming && <Upcoming />}
+        {main.upcoming && <Upcoming view={"board"} />}
       </div>
       {modal.addTask && <SaveTaskModal />}
       {modal.search && <SearchModal />}

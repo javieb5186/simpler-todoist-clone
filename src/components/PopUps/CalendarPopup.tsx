@@ -1,5 +1,5 @@
 import calendar from "calendar-js";
-import { Dispatch, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 
 const cal = calendar();
 const todaysDate = new Date();
@@ -27,15 +27,23 @@ const months = [
 interface Props {
   selectedDate: string[];
   setSelectedDate: Dispatch<React.SetStateAction<string[]>>;
+  callBack?: () => void;
 }
 
 export default function CalendarPopup({
   selectedDate,
   setSelectedDate,
+  callBack,
 }: Props) {
   const [calendar, setCalendar] = useState(
     cal.of(currentYear, currentMonth - 1),
   );
+
+  useEffect(() => {
+    if (selectedDate.length > 0) {
+      setCalendar(cal.of(Number(selectedDate[2]), Number(selectedDate[0]) - 1));
+    }
+  }, []);
 
   const handleNextMonth = () => {
     setCalendar((prevCalendar) => {
@@ -75,6 +83,7 @@ export default function CalendarPopup({
     const dayStr = String(day);
     const yearStr = String(year);
     setSelectedDate([monthStr, dayStr, yearStr]);
+    if (callBack) callBack();
   };
 
   return (
