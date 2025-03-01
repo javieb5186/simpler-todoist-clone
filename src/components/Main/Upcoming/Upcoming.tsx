@@ -1,84 +1,16 @@
-import { Fragment, useEffect, useState } from "react";
-import TaskComponent from "./TaskComponent";
+import { useEffect, useState } from "react";
 import { QueryExecResult } from "sql.js";
-import { useDatabase } from "../../hooks/useDatabase";
+import { useDatabase } from "../../../hooks/useDatabase";
 import calendar from "calendar-js";
-import CalendarPopup from "../PopUps/CalendarPopup";
+import CalendarPopup from "../../PopUps/CalendarPopup";
+import RenderTasksToDays from "./RenderTasksToDays";
+import { SelectedWeek } from "./interface";
 
 interface Props {
   view: "list" | "board";
 }
 
-interface SelectedWeek {
-  weekDays: number[];
-  month: number;
-  year: number;
-  prevMonth: boolean;
-  nextMonth: boolean;
-  otherDays: number;
-}
-
 const cal = calendar();
-
-interface RenderTasks {
-  tasks: QueryExecResult[];
-  selectedWeek: SelectedWeek;
-}
-
-function RenderTasksToDays({ tasks, selectedWeek }: RenderTasks) {
-  const week = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-
-  return (
-    <div className="grid grid-cols-7 gap-x-2 *:justify-center">
-      {week.map((day, index) => {
-        return (
-          <div key={day} className="space-y-4">
-            <div className="flex gap-x-2">
-              <span>{day}</span>
-              <span>{selectedWeek.weekDays[index]}</span>
-            </div>
-            {tasks.map((task) => {
-              const thisDayTask = task.values.filter((taskData) => {
-                return (
-                  Number(String(taskData[3]).split("-")[2]) ===
-                  selectedWeek.weekDays[index]
-                );
-              });
-
-              if (thisDayTask) {
-                return (
-                  <Fragment key={String(thisDayTask[0])}>
-                    {thisDayTask.map((task) => {
-                      return (
-                        <TaskComponent
-                          key={String(task[0])}
-                          title={String(task[1])}
-                          description={String(task[2])}
-                          id={Number(task[5])}
-                          view="board"
-                        />
-                      );
-                    })}
-                  </Fragment>
-                );
-              } else {
-                return <></>;
-              }
-            })}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 export default function Upcoming({ view }: Props) {
   const { db } = useDatabase();
@@ -101,7 +33,7 @@ export default function Upcoming({ view }: Props) {
       .flat();
 
     // Check if a previous or next month is in calendarjs
-    let hasZeros = week.some((value) => value === 0);
+    const hasZeros = week.some((value) => value === 0);
     let prev = false;
     let next = false;
     let length = 0;
@@ -147,7 +79,7 @@ export default function Upcoming({ view }: Props) {
       nextMonth: next,
       otherDays: length,
     });
-  }, [cal, selectedDate]);
+  }, [selectedDate]);
 
   // Get all tasks from between the start and end date
   useEffect(() => {
@@ -209,7 +141,7 @@ export default function Upcoming({ view }: Props) {
         setUpcomingTasks(results);
       }
     }
-  }, [selectedWeek]);
+  }, [db, selectedWeek]);
 
   return (
     <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pb-4 pt-12 md:px-8">
@@ -235,41 +167,56 @@ export default function Upcoming({ view }: Props) {
       </div>
       {view === "list" ? (
         <div className="mx-auto w-full space-y-2 md:max-w-screen-md">
-          <div className="space-y-8">
-            <div>
-              <h1 className="text-2xl font-bold">Upcoming</h1>
-              <div className="flex items-center gap-x-2">
-                <svg
-                  className="h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 512 512"
-                >
-                  Font Awesome Free 6.7.2 by @fontawesome -
-                  https://fontawesome.com License -
-                  https://fontawesome.com/license/free Copyright 2025 Fonticons,
-                  Inc.
-                  <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z" />
-                </svg>
-                <span>
-                  {upcomingTasks.length > 0 && upcomingTasks[0].values.length}{" "}
-                  tasks
-                </span>
-              </div>
-            </div>
-          </div>
-          <button className="flex items-center gap-x-2 py-2 pr-4">
-            <svg
-              className="h-4 w-4 fill-[#DC4C3E]"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 448 512"
+          <h1 className="text-2xl font-bold">Upcoming</h1>
+          <div className="relative flex justify-between">
+            <button
+              className="flex items-center gap-x-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                setCalendarPopUp(!calendarPopUp);
+              }}
             >
-              Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com
-              License - https://fontawesome.com/license/free Copyright 2025
-              Fonticons, Inc.
-              <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z" />
-            </svg>
-            <span>Add Task</span>
-          </button>
+              <span>
+                {
+                  cal.of(Number(selectedDate[2]), Number(selectedDate[0]) - 1)
+                    .month
+                }
+              </span>
+              <span>
+                {
+                  cal.of(Number(selectedDate[2]), Number(selectedDate[0]) - 1)
+                    .year
+                }
+              </span>
+              <svg
+                className="h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+              >
+                Font Awesome Free 6.7.2 by @fontawesome -
+                https://fontawesome.com License -
+                https://fontawesome.com/license/free Copyright 2025 Fonticons,
+                Inc.
+                <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
+              </svg>
+            </button>
+            {calendarPopUp && (
+              <CalendarPopup
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                callBack={() => {
+                  setCalendarPopUp(false);
+                }}
+              />
+            )}
+          </div>
+          {selectedWeek && (
+            <RenderTasksToDays
+              tasks={upcomingTasks}
+              selectedWeek={selectedWeek}
+              view={view}
+            />
+          )}
         </div>
       ) : (
         <div className="w-full space-y-2">
@@ -320,24 +267,9 @@ export default function Upcoming({ view }: Props) {
             <RenderTasksToDays
               tasks={upcomingTasks}
               selectedWeek={selectedWeek}
+              view={view}
             />
           )}
-          {/* <div className="grid grid-cols-7 gap-x-2">
-            <div className="space-y-4">
-              {upcomingTasks.length > 0 &&
-                upcomingTasks[0].values.map((task) => {
-                  return (
-                    <TaskComponent
-                      key={String(task[1])}
-                      title={String(task[1])}
-                      description={String(task[2])}
-                      id={Number(task[5])}
-                      view="board"
-                    />
-                  );
-                })}
-            </div>
-          </div> */}
         </div>
       )}
     </div>

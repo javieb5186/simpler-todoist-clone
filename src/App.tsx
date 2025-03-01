@@ -7,7 +7,7 @@ import SaveTaskModal from "./modals/SaveTaskModal";
 import SearchModal from "./modals/SearchModal";
 import { useEffect, useState } from "react";
 import Category from "./components/Main/Category";
-import Upcoming from "./components/Main/Upcoming";
+import Upcoming from "./components/Main/Upcoming/Upcoming";
 
 const ModalChild = () => {
   const [modal] = useModal();
