@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useDatabase } from "../../hooks/useDatabase";
 import useWindowWidth from "../../hooks/useWindowWidth";
+import { DatabaseContextProps } from "../../contexts/DatabaseProvider";
+import { Database } from "sql.js";
 
 interface TaskProps {
   title: string;
@@ -9,12 +11,29 @@ interface TaskProps {
   view: "list" | "board";
 }
 
+function updateCompleted(database: Database | null, taskId: number) {
+  try {
+    const db = database;
+    if (db) {
+      db.run("UPDATE tasks SET is_completed = ? WHERE id = ?", [1, taskId]);
+    }
+    console.log("success");
+  } catch (error) {
+    if (error) console.log(error);
+  }
+}
+
 const TaskComponent = ({ title, description, id, view }: TaskProps) => {
   const { db } = useDatabase();
   const width = useWindowWidth();
   const [categoryStr, setCategoryStr] = useState("");
   const [hover, setHover] = useState(false);
   const [contentHover, setContentHover] = useState(false);
+
+  const handleCompleted = () => {
+    updateCompleted(db, id);
+    console.log("Completed");
+  };
 
   // Get category based on id and display
   useEffect(() => {
@@ -37,6 +56,7 @@ const TaskComponent = ({ title, description, id, view }: TaskProps) => {
       className={`relative flex w-full items-start justify-start gap-x-2 ${view === "list" ? "border-b border-neutral-400" : "max-w-[20rem] rounded border border-neutral-800 p-2 drop-shadow"}`}
     >
       <button
+        onClick={handleCompleted}
         onMouseOver={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >

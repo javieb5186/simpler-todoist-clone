@@ -22,24 +22,26 @@ export const DatabaseProvider = ({ children }: Props) => {
   useEffect(() => {
     const setupDatabase = async () => {
       let database;
-      database = await loadDatabaseFromLocalStorage();
-      if (!database) {
-        const SQL = await initSqlJs({
-          locateFile: () => {
-            return `/sql-wasm.wasm`;
-          },
-        });
-        database = new SQL.Database();
-        database.run(
-          "CREATE TABLE IF NOT EXISTS task_categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(50) NOT NULL UNIQUE);\
+      try {
+        database = await loadDatabaseFromLocalStorage();
+        if (!database) {
+          const SQL = await initSqlJs({
+            locateFile: () => {
+              return `/sql-wasm.wasm`;
+            },
+          });
+          database = new SQL.Database();
+          database.run(
+            "CREATE TABLE IF NOT EXISTS task_categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(50) NOT NULL UNIQUE);\
            INSERT INTO task_categories (name) VALUES('personal'),('work'),('other');\
-           CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT, set_date DATE NOT NULL, set_time TIME, category_id INTEGER, FOREIGN KEY (category_id) REFERENCES task_categories(id));\
-           INSERT INTO tasks (title, description, set_date, category_id) VALUES('Complete coding assignment', 'Finish coding the project for the interview.', '2025-01-19', (SELECT id FROM task_categories WHERE name = 'work'));\
-           INSERT INTO tasks (title, description, set_date, category_id) VALUES('Take out trash', 'Take out trash before I leave for work', '2025-01-19', (SELECT id FROM task_categories WHERE name = 'personal'));",
-        );
-        saveDatabaseToLocalStorage(database);
+           CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT, set_date DATE NOT NULL, set_time TIME, category_id INTEGER, is_completed INTEGER NOT NULL CHECK(is_completed IN (0,1)) DEFAULT 0, FOREIGN KEY (category_id) REFERENCES task_categories(id));",
+          );
+          saveDatabaseToLocalStorage(database);
+        }
+        setDb(database);
+      } catch (error) {
+        console.error(error);
       }
-      setDb(database);
     };
 
     setupDatabase();

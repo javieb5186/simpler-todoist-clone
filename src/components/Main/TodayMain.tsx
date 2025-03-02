@@ -38,6 +38,10 @@ export default function TodayMain() {
     setOpenView(false);
   });
 
+  useEffect(() => {
+    console.log(todaysTasks);
+  }, [todaysTasks]);
+
   return (
     <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pb-4 pt-12 md:px-8">
       <div className="absolute right-0 top-0 z-[5] px-2 py-2 md:px-0">
