@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { useDatabase } from "../../hooks/useDatabase";
 import useWindowWidth from "../../hooks/useWindowWidth";
-import { DatabaseContextProps } from "../../contexts/DatabaseProvider";
 import { Database } from "sql.js";
+import saveDatabaseToLocalStorage from "../../utils/saveDatabaseToLocalStorage";
 
 interface TaskProps {
+  taskId: number;
   title: string;
   description: string;
-  id: number;
+  categoryId: number;
   view: "list" | "board";
+  onClickCallback?: () => void;
 }
 
 function updateCompleted(database: Database | null, taskId: number) {
@@ -16,14 +18,21 @@ function updateCompleted(database: Database | null, taskId: number) {
     const db = database;
     if (db) {
       db.run("UPDATE tasks SET is_completed = ? WHERE id = ?", [1, taskId]);
+      saveDatabaseToLocalStorage(db);
     }
-    console.log("success");
   } catch (error) {
     if (error) console.log(error);
   }
 }
 
-const TaskComponent = ({ title, description, id, view }: TaskProps) => {
+const TaskComponent = ({
+  taskId,
+  title,
+  description,
+  categoryId,
+  view,
+  onClickCallback,
+}: TaskProps) => {
   const { db } = useDatabase();
   const width = useWindowWidth();
   const [categoryStr, setCategoryStr] = useState("");
@@ -31,8 +40,8 @@ const TaskComponent = ({ title, description, id, view }: TaskProps) => {
   const [contentHover, setContentHover] = useState(false);
 
   const handleCompleted = () => {
-    updateCompleted(db, id);
-    console.log("Completed");
+    updateCompleted(db, taskId);
+    if (onClickCallback) onClickCallback();
   };
 
   // Get category based on id and display
@@ -40,7 +49,7 @@ const TaskComponent = ({ title, description, id, view }: TaskProps) => {
     try {
       if (db) {
         const res = db.exec("SELECT name FROM task_categories WHERE id = $id", {
-          $id: id,
+          $id: categoryId,
         });
         const str = String(res[0].values[0][0]);
         const capitializeStr = str[0].toUpperCase() + str.slice(1);
@@ -49,7 +58,7 @@ const TaskComponent = ({ title, description, id, view }: TaskProps) => {
     } catch (error) {
       if (error) console.log(error);
     }
-  }, [id, db]);
+  }, [categoryId, db]);
 
   return (
     <div

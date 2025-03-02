@@ -20,7 +20,7 @@ export default function Category({ category, view }: Props) {
     try {
       if (db) {
         const results = db.exec(
-          "SELECT * FROM tasks WHERE category_id = (SELECT id FROM task_categories WHERE name = $category)",
+          "SELECT * FROM tasks WHERE category_id = (SELECT id FROM task_categories WHERE name = $category)  AND is_completed != 1;",
           { $category: category },
         );
         setCategoryTasks(results);
@@ -80,9 +80,10 @@ export default function Category({ category, view }: Props) {
                 return (
                   <TaskComponent
                     key={String(task[1])}
+                    taskId={Number(task[0])}
                     title={String(task[1])}
                     description={String(task[2])}
-                    id={Number(task[5])}
+                    categoryId={Number(task[5])}
                     view="list"
                   />
                 );
@@ -130,9 +131,10 @@ export default function Category({ category, view }: Props) {
                 return (
                   <TaskComponent
                     key={String(task[1])}
+                    taskId={Number(task[0])}
                     title={String(task[1])}
                     description={String(task[2])}
-                    id={Number(task[5])}
+                    categoryId={Number(task[5])}
                     view="board"
                   />
                 );

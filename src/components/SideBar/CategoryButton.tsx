@@ -15,11 +15,11 @@ const CategoryButton = ({ category, onClick }: CategoryButtonProps) => {
   useEffect(() => {
     if (db) {
       const result = db.exec(
-        "SELECT * FROM tasks WHERE category_id = (SELECT id FROM task_categories WHERE name = $category)",
+        "SELECT * FROM tasks WHERE category_id = (SELECT id FROM task_categories WHERE name = $category) AND is_completed != 1;",
         { $category: category },
       );
 
-      if (result.length) {
+      if (result[0]) {
         setCounter(result[0].values.length);
       }
     }

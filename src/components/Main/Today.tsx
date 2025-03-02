@@ -13,26 +13,30 @@ const isoDate = formattedDate.toISOString().slice(0, 10);
 
 const uiDate = formattedDate.toDateString().split(" ");
 
-export default function TodayMain() {
+export default function Today() {
   const { db, fetch } = useDatabase();
   const viewRef = useRef<HTMLDivElement>(null);
   const [todaysTasks, setTodaysTasks] = useState<QueryExecResult[]>([]);
   const [view, setView] = useState<"list" | "board">("board");
   const [openView, setOpenView] = useState(true);
+  const [trigger, setTrigger] = useState(false);
 
   // Get all tasks that are for today and display it
   useEffect(() => {
     try {
       if (db) {
-        const results = db.exec("SELECT * FROM tasks WHERE set_date = $date", {
-          $date: isoDate,
-        });
+        const results = db.exec(
+          "SELECT * FROM tasks WHERE set_date = $date AND is_completed != 1;",
+          {
+            $date: isoDate,
+          },
+        );
         setTodaysTasks(results);
       }
     } catch (error) {
       if (error) console.log(error);
     }
-  }, [db, fetch]);
+  }, [db, fetch, trigger]);
 
   useClickAway(viewRef, () => {
     setOpenView(false);
@@ -99,9 +103,10 @@ export default function TodayMain() {
                 return (
                   <TaskComponent
                     key={String(task[1])}
+                    taskId={Number(task[0])}
                     title={String(task[1])}
                     description={String(task[2])}
-                    id={Number(task[5])}
+                    categoryId={Number(task[5])}
                     view="list"
                   />
                 );
@@ -154,10 +159,12 @@ export default function TodayMain() {
                 return (
                   <TaskComponent
                     key={String(task[1])}
+                    taskId={Number(task[0])}
                     title={String(task[1])}
                     description={String(task[2])}
-                    id={Number(task[5])}
+                    categoryId={Number(task[5])}
                     view="board"
+                    onClickCallback={() => setTrigger(!trigger)}
                   />
                 );
               })}

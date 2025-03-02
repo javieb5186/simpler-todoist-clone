@@ -28,7 +28,7 @@ export default function Upcoming({ view }: Props) {
     const selectedMonth = Number(selectedDate[0]);
     const selectedDay = Number(selectedDate[1]);
     const data = cal.of(selectedYear, selectedMonth - 1);
-    let week = data.calendar
+    const week = data.calendar
       .filter((week) => week.includes(selectedDay))
       .flat();
 
@@ -37,6 +37,7 @@ export default function Upcoming({ view }: Props) {
     let prev = false;
     let next = false;
     let length = 0;
+    let newWeek = week;
 
     if (hasZeros) {
       const filteredWeek = week.filter((day) => day !== 0);
@@ -53,9 +54,9 @@ export default function Upcoming({ view }: Props) {
           newYear--;
         }
         const prevCal = cal.of(newYear, newMonth);
-        const prevWeek = prevCal.calendar[0];
+        const prevWeek = prevCal.calendar[prevCal.calendar.length - 1];
         const filteredPrevWeek = prevWeek.filter((day) => day !== 0);
-        week = [filteredPrevWeek, filteredWeek].flat();
+        newWeek = [filteredPrevWeek, filteredWeek].flat();
       } else if (week[week.length - 1] === 0) {
         next = true;
         let newMonth = selectedMonth;
@@ -67,12 +68,12 @@ export default function Upcoming({ view }: Props) {
         const nextCal = cal.of(newYear, newMonth);
         const nextWeek = nextCal.calendar[0];
         const filteredNextWeek = nextWeek.filter((day) => day !== 0);
-        week = [filteredWeek, filteredNextWeek].flat();
+        newWeek = [filteredWeek, filteredNextWeek].flat();
       }
     }
 
     setSelectedWeek({
-      weekDays: week,
+      weekDays: newWeek,
       month: selectedMonth - 1,
       year: selectedYear,
       prevMonth: prev,
@@ -109,7 +110,7 @@ export default function Upcoming({ view }: Props) {
             .slice(0, 10);
 
           results = db.exec(
-            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate",
+            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate AND is_completed != 1;",
             {
               $startDate: startISODate,
               $endDate: endISODate,
@@ -123,7 +124,7 @@ export default function Upcoming({ view }: Props) {
             .slice(0, 10);
 
           results = db.exec(
-            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate",
+            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate AND is_completed != 1;",
             {
               $startDate: startISODate,
               $endDate: endISODate,
@@ -131,7 +132,7 @@ export default function Upcoming({ view }: Props) {
           );
         } else {
           results = db.exec(
-            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate",
+            "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate AND is_completed != 1;",
             {
               $startDate: startISODate,
               $endDate: endISODate,
@@ -142,6 +143,10 @@ export default function Upcoming({ view }: Props) {
       }
     }
   }, [db, selectedWeek]);
+
+  useEffect(() => {
+    console.log(selectedWeek);
+  }, [selectedWeek]);
 
   return (
     <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pb-4 pt-12 md:px-8">

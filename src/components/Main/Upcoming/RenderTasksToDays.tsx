@@ -58,9 +58,10 @@ export default function RenderTasksToDays({
                           return (
                             <TaskComponent
                               key={String(task[0])}
+                              taskId={Number(task[0])}
                               title={String(task[1])}
                               description={String(task[2])}
-                              id={Number(task[5])}
+                              categoryId={Number(task[5])}
                               view={view}
                             />
                           );
@@ -111,9 +112,10 @@ export default function RenderTasksToDays({
                           return (
                             <TaskComponent
                               key={String(task[0])}
+                              taskId={Number(task[0])}
                               title={String(task[1])}
                               description={String(task[2])}
-                              id={Number(task[5])}
+                              categoryId={Number(task[5])}
                               view={view}
                             />
                           );

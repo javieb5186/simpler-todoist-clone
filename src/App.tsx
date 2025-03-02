@@ -1,5 +1,5 @@
 import SideBar from "./components/SideBar/SideBar";
-import TodayMain from "./components/Main/TodayMain";
+import Today from "./components/Main/Today";
 import { DatabaseProvider } from "./contexts/DatabaseProvider";
 import ModalProvider from "./contexts/ModalProvider";
 import { useModal } from "./contexts/useModalContext";
@@ -8,6 +8,7 @@ import SearchModal from "./modals/SearchModal";
 import { useEffect, useState } from "react";
 import Category from "./components/Main/Category";
 import Upcoming from "./components/Main/Upcoming/Upcoming";
+import Completed from "./components/Main/Completed";
 
 const ModalChild = () => {
   const [modal] = useModal();
@@ -26,11 +27,12 @@ const ModalChild = () => {
     <>
       <div className="flex">
         <SideBar setState={setMain} />
-        {main.today && <TodayMain />}
+        {main.today && <Today />}
         {main.category.length > 0 && (
           <Category category={main.category} view={"list"} />
         )}
         {main.upcoming && <Upcoming view={"board"} />}
+        {main.completed && <Completed />}
       </div>
       {modal.addTask && <SaveTaskModal />}
       {modal.search && <SearchModal />}
