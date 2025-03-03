@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDatabase } from "../../hooks/useDatabase";
-import { QueryExecResult } from "sql.js";
+import { SqlValue } from "sql.js";
+import saveDatabaseToLocalStorage from "../../utils/saveDatabaseToLocalStorage";
 
 export default function Completed() {
   const { db } = useDatabase();
-  const [completedTasks, setCompletedTasks] = useState<QueryExecResult[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<SqlValue[][]>();
 
   useEffect(() => {
     try {
@@ -13,17 +14,39 @@ export default function Completed() {
           1,
         ]);
         // In here check to see if the task is more than one week old
+        const newResults = results[0].values.filter((task) => {
+          const taskDate = String(task[7]).split(", ")[0].split("/");
+          const checkDate = new Date(
+            Number(taskDate[2]),
+            Number(taskDate[0]) - 1,
+            Number(taskDate[1]),
+          );
+          const currentDate = new Date();
+          const reducedDate = currentDate.toLocaleDateString().split("/");
+          const expiredDate = new Date(
+            Number(reducedDate[2]),
+            Number(reducedDate[0]) - 1,
+            Number(reducedDate[1]),
+          );
+          if (checkDate < expiredDate) {
+            db.run("DELETE FROM tasks WHERE id = ?", [Number(task[0])]);
+            saveDatabaseToLocalStorage(db);
+            return false;
+          }
+          return true;
+        });
         // If it is, remove from database and from results
-        setCompletedTasks(results);
+        console.log("results", newResults);
+        setCompletedTasks(newResults);
       }
     } catch (error) {
       if (error) console.log(error);
     }
   }, [db]);
 
-  useEffect(() => {
-    console.log(completedTasks);
-  }, [completedTasks]);
+  // useEffect(() => {
+  //   console.log(completedTasks);
+  // }, [completedTasks]);
 
   return (
     <div className="relative h-screen min-w-80 flex-1 space-y-8 overflow-y-auto px-2 pb-4 pt-12 md:px-8">
@@ -31,8 +54,8 @@ export default function Completed() {
         <h1>Completed</h1>
       </div>
       <div className="space-y-4">
-        {completedTasks.length > 0 &&
-          completedTasks[0].values.map((task) => {
+        {completedTasks &&
+          completedTasks.map((task) => {
             let categorySearch;
             const dateTime = String(task[7]).split(", ");
 
