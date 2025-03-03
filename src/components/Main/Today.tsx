@@ -4,6 +4,7 @@ import { QueryExecResult } from "sql.js";
 import TaskComponent from "./TaskComponent";
 import ViewPopup from "../PopUps/ViewPopup";
 import useClickAway from "../../hooks/useClickAway";
+import { useModal } from "../../contexts/useModalContext";
 
 // Seralize data to be used by sql
 const todaysDate = new Date().toLocaleDateString();
@@ -15,6 +16,7 @@ const uiDate = formattedDate.toDateString().split(" ");
 
 export default function Today() {
   const { db, fetch } = useDatabase();
+  const [modal, setModal] = useModal();
   const viewRef = useRef<HTMLDivElement>(null);
   const [todaysTasks, setTodaysTasks] = useState<QueryExecResult[]>([]);
   const [view, setView] = useState<"list" | "board">("board");
@@ -168,7 +170,12 @@ export default function Today() {
                   />
                 );
               })}
-            <button className="flex items-center gap-x-2 py-2 pr-4">
+            <button
+              className="flex items-center gap-x-2 py-2 pr-4"
+              onClick={() => {
+                setModal({ ...modal, addTask: true });
+              }}
+            >
               <svg
                 className="h-4 w-4 fill-[#DC4C3E]"
                 xmlns="http://www.w3.org/2000/svg"

@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { useDatabase } from "../../hooks/useDatabase";
 import { QueryExecResult } from "sql.js";
 import TaskComponent from "./TaskComponent";
+import { IndirectData } from "../../App";
+import { useModal } from "../../contexts/useModalContext";
 
 interface Props {
   category: string;
   view: "list" | "board";
+  setIndirectData: React.Dispatch<
+    React.SetStateAction<IndirectData | undefined>
+  >;
 }
 
-export default function Category({ category, view }: Props) {
+export default function Category({ category, view, setIndirectData }: Props) {
   const { db } = useDatabase();
+  const [modal, setModal] = useModal();
   const [categoryTasks, setCategoryTasks] = useState<QueryExecResult[]>([]);
 
   useEffect(() => {
@@ -89,7 +95,13 @@ export default function Category({ category, view }: Props) {
                 );
               })}
           </div>
-          <button className="flex items-center gap-x-2 py-2 pr-4">
+          <button
+            className="flex items-center gap-x-2 py-2 pr-4"
+            onClick={() => {
+              setIndirectData({ category: category });
+              setModal({ ...modal, addTask: true });
+            }}
+          >
             <svg
               className="h-4 w-4 fill-[#DC4C3E]"
               xmlns="http://www.w3.org/2000/svg"

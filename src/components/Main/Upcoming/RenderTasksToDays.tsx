@@ -2,6 +2,7 @@ import { QueryExecResult } from "sql.js";
 import { SelectedWeek } from "./interface";
 import { Fragment } from "react/jsx-runtime";
 import TaskComponent from "../TaskComponent";
+import { useEffect } from "react";
 
 interface RenderTasks {
   tasks: QueryExecResult[];
@@ -23,6 +24,10 @@ export default function RenderTasksToDays({
     "Friday",
     "Saturday",
   ];
+
+  useEffect(() => {
+    console.log(selectedWeek);
+  }, [selectedWeek]);
 
   return (
     <div className="space-y-4">

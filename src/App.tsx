@@ -10,6 +10,10 @@ import Category from "./components/Main/Category";
 import Upcoming from "./components/Main/Upcoming/Upcoming";
 import Completed from "./components/Main/Completed";
 
+export interface IndirectData {
+  category?: string;
+}
+
 const ModalChild = () => {
   const [modal] = useModal();
   const [main, setMain] = useState({
@@ -19,6 +23,7 @@ const ModalChild = () => {
     overdue: false,
     category: "",
   });
+  const [indirectData, setIndirectData] = useState<IndirectData | undefined>();
 
   useEffect(() => {
     console.log(main);
@@ -29,12 +34,16 @@ const ModalChild = () => {
         <SideBar setState={setMain} />
         {main.today && <Today />}
         {main.category.length > 0 && (
-          <Category category={main.category} view={"list"} />
+          <Category
+            category={main.category}
+            view={"list"}
+            setIndirectData={setIndirectData}
+          />
         )}
         {main.upcoming && <Upcoming view={"board"} />}
         {main.completed && <Completed />}
       </div>
-      {modal.addTask && <SaveTaskModal />}
+      {modal.addTask && <SaveTaskModal category={indirectData?.category} />}
       {modal.search && <SearchModal />}
     </>
   );

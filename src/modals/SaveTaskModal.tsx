@@ -7,7 +7,11 @@ import TimePopup from "../components/PopUps/TimePopup";
 import { useDatabase } from "../hooks/useDatabase";
 import saveDatabaseToLocalStorage from "../utils/saveDatabaseToLocalStorage";
 
-export default function SaveTaskModal() {
+interface Props {
+  category?: string;
+}
+
+export default function SaveTaskModal({ category }: Props) {
   const { db, setFetch } = useDatabase();
   const [modal, setModal] = useModal();
   const [inputValue, setInputValue] = useState("");
@@ -17,7 +21,7 @@ export default function SaveTaskModal() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toLocaleDateString().split("/"),
   );
-  const [selectedCategory, setSelectedCategory] = useState("other");
+  const [selectedCategory, setSelectedCategory] = useState(category || "other");
   const [timePopup, setTimePopup] = useState(false);
   const [selectedTime, setSelectedTime] = useState<string[]>([]);
   const [disabled, setDisabled] = useState(false);
@@ -48,7 +52,7 @@ export default function SaveTaskModal() {
         const dbTime = `${hourStr}:${selectedTime[1]}`;
 
         let prep;
-        if (selectedTime) {
+        if (!selectedTime) {
           prep = db.prepare(
             "INSERT INTO tasks (title, description, set_date, category_id) VALUES(?, ?, ?, (SELECT id FROM task_categories WHERE name = ?));",
           );
@@ -69,7 +73,9 @@ export default function SaveTaskModal() {
         setModal({ ...modal, addTask: false });
         setFetch();
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
