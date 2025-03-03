@@ -17,7 +17,12 @@ function updateCompleted(database: Database | null, taskId: number) {
   try {
     const db = database;
     if (db) {
+      const currentDateTime = new Date();
       db.run("UPDATE tasks SET is_completed = ? WHERE id = ?", [1, taskId]);
+      db.run("UPDATE tasks SET completed_date = ? WHERE id = ?", [
+        currentDateTime.toLocaleString(),
+        taskId,
+      ]);
       saveDatabaseToLocalStorage(db);
     }
   } catch (error) {

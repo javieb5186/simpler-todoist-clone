@@ -12,6 +12,8 @@ export default function Completed() {
         const results = db.exec("SELECT * FROM tasks WHERE is_completed = ?", [
           1,
         ]);
+        // In here check to see if the task is more than one week old
+        // If it is, remove from database and from results
         setCompletedTasks(results);
       }
     } catch (error) {
@@ -32,6 +34,7 @@ export default function Completed() {
         {completedTasks.length > 0 &&
           completedTasks[0].values.map((task) => {
             let categorySearch;
+            const dateTime = String(task[7]).split(", ");
 
             if (db) {
               categorySearch = db.exec(
@@ -39,8 +42,6 @@ export default function Completed() {
                 [Number(task[5])],
               );
             }
-
-            console.log("Category", categorySearch);
 
             return (
               <div
@@ -62,7 +63,9 @@ export default function Completed() {
                 </div>
                 <div className="w-full">
                   <h2>You completed: {String(task[1])}</h2>
-                  <p>On date at time</p>
+                  <p className="text-neutral-500">
+                    On {dateTime[0]} at {dateTime[1]}
+                  </p>
                   <p className="text-right">
                     {categorySearch && String(categorySearch[0].values[0])}
                   </p>
