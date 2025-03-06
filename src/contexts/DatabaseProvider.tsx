@@ -34,7 +34,8 @@ export const DatabaseProvider = ({ children }: Props) => {
           database.run(
             "CREATE TABLE IF NOT EXISTS task_categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(50) NOT NULL UNIQUE);\
            INSERT INTO task_categories (name) VALUES('personal'),('work'),('other');\
-           CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT, set_date DATE NOT NULL, set_time TIME, category_id INTEGER, is_completed INTEGER NOT NULL CHECK(is_completed IN (0,1)) DEFAULT 0, completed_date DATETIME, FOREIGN KEY (category_id) REFERENCES task_categories(id));",
+           CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT, set_date DATE NOT NULL, set_time TIME, category_id INTEGER, is_completed INTEGER NOT NULL CHECK(is_completed IN (0,1)) DEFAULT 0, completed_date DATETIME, FOREIGN KEY (category_id) REFERENCES task_categories(id));\
+           CREATE TABLE IF NOT EXISTS searches (id INTEGER PRIMARY KEY AUTOINCREMENT, search VARCHAR(255) NOT NULL);",
           );
           saveDatabaseToLocalStorage(database);
         }

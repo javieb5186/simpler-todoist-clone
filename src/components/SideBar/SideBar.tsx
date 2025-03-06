@@ -7,6 +7,7 @@ import CategoryButton from "./CategoryButton";
 import { useModal } from "../../contexts/useModalContext";
 
 const reset = {
+  search: false,
   today: false,
   upcoming: false,
   completed: false,
@@ -17,6 +18,7 @@ const reset = {
 interface Props {
   setState: Dispatch<
     React.SetStateAction<{
+      search: boolean;
       today: boolean;
       upcoming: boolean;
       completed: boolean;
@@ -132,7 +134,7 @@ export default function SideBar({ setState }: Props) {
           </div>
           <button
             className="flex items-center gap-x-2"
-            onClick={() => setModal({ ...modal, search: true })}
+            onClick={() => setState({ ...reset, search: true })}
           >
             <svg
               className="h-6 w-6"

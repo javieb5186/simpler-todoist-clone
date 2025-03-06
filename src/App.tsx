@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Category from "./components/Main/Category";
 import Upcoming from "./components/Main/Upcoming/Upcoming";
 import Completed from "./components/Main/Completed";
+import Search from "./components/Main/Search";
 
 export interface IndirectData {
   category?: string;
@@ -17,6 +18,7 @@ export interface IndirectData {
 const ModalChild = () => {
   const [modal] = useModal();
   const [main, setMain] = useState({
+    search: false,
     today: true,
     upcoming: false,
     completed: false,
@@ -32,6 +34,7 @@ const ModalChild = () => {
     <>
       <div className="flex">
         <SideBar setState={setMain} />
+        {main.search && <Search />}
         {main.today && <Today />}
         {main.category.length > 0 && (
           <Category
