@@ -10,6 +10,7 @@ import Category from "./components/Main/Category";
 import Upcoming from "./components/Main/Upcoming/Upcoming";
 import Completed from "./components/Main/Completed";
 import Search from "./components/Main/Search";
+import Overdue from "./components/Main/Overdue";
 
 export interface IndirectData {
   category?: string;
@@ -45,6 +46,7 @@ const ModalChild = () => {
         )}
         {main.upcoming && <Upcoming view={"board"} />}
         {main.completed && <Completed />}
+        {main.overdue && <Overdue />}
       </div>
       {modal.addTask && <SaveTaskModal category={indirectData?.category} />}
       {modal.search && <SearchModal />}
