@@ -3,17 +3,23 @@ import { SelectedWeek } from "./interface";
 import { Fragment } from "react/jsx-runtime";
 import TaskComponent from "../TaskComponent";
 import { useEffect } from "react";
+import { IndirectData } from "../../../App";
+import { useModal } from "../../../contexts/useModalContext";
 
 interface RenderTasks {
   tasks: QueryExecResult[];
   selectedWeek: SelectedWeek;
   view: "board" | "list";
+  setIndirectData: React.Dispatch<
+    React.SetStateAction<IndirectData | undefined>
+  >;
 }
 
 export default function RenderTasksToDays({
   tasks,
   selectedWeek,
   view,
+  setIndirectData,
 }: RenderTasks) {
   const week = [
     "Sunday",
@@ -24,6 +30,8 @@ export default function RenderTasksToDays({
     "Friday",
     "Saturday",
   ];
+
+  const [modal, setModal] = useModal();
 
   useEffect(() => {
     console.log(selectedWeek);
@@ -75,7 +83,36 @@ export default function RenderTasksToDays({
                     );
                   }
                 })}
-                <button className="flex items-center gap-x-2 py-2 pr-4">
+                <button
+                  className="flex items-center gap-x-2 py-2 pr-4"
+                  onClick={() => {
+                    let month = selectedWeek.month;
+                    if (selectedWeek.nextMonth) {
+                      if (selectedWeek.weekDays[index] < 7) month = month + 1;
+                    } else if (selectedWeek.prevMonth) {
+                      if (selectedWeek.weekDays[index] > 7) month = month - 1;
+                    }
+
+                    let year = selectedWeek.year;
+
+                    if (month > 11) {
+                      year++;
+                      month = 0;
+                    } else if (month < 0) {
+                      year--;
+                      month = 11;
+                    }
+
+                    const newDate = new Date(
+                      year,
+                      month,
+                      selectedWeek.weekDays[index],
+                    );
+                    const dateArr = newDate.toLocaleDateString().split("/");
+                    setIndirectData({ date: dateArr });
+                    setModal({ ...modal, addTask: true });
+                  }}
+                >
                   <svg
                     className="h-4 w-4 fill-[#DC4C3E]"
                     xmlns="http://www.w3.org/2000/svg"

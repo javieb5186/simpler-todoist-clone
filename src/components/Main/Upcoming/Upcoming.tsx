@@ -5,14 +5,18 @@ import calendar from "calendar-js";
 import CalendarPopup from "../../PopUps/CalendarPopup";
 import RenderTasksToDays from "./RenderTasksToDays";
 import { SelectedWeek } from "./interface";
+import { IndirectData } from "../../../App";
 
 interface Props {
   view: "list" | "board";
+  setIndirectData: React.Dispatch<
+    React.SetStateAction<IndirectData | undefined>
+  >;
 }
 
 const cal = calendar();
 
-export default function Upcoming({ view }: Props) {
+export default function Upcoming({ view, setIndirectData }: Props) {
   const { db } = useDatabase();
   const [upcomingTasks, setUpcomingTasks] = useState<QueryExecResult[]>([]);
   const [calendarPopUp, setCalendarPopUp] = useState(false);
@@ -24,62 +28,66 @@ export default function Upcoming({ view }: Props) {
   // Initial instance of cal creates the selected week.
   // Which defaults to today
   useEffect(() => {
-    const selectedYear = Number(selectedDate[2]);
-    const selectedMonth = Number(selectedDate[0]);
-    const selectedDay = Number(selectedDate[1]);
-    const data = cal.of(selectedYear, selectedMonth - 1);
-    const week = data.calendar
-      .filter((week) => week.includes(selectedDay))
-      .flat();
+    try {
+      const selectedYear = Number(selectedDate[2]);
+      const selectedMonth = Number(selectedDate[0]);
+      const selectedDay = Number(selectedDate[1]);
+      const data = cal.of(selectedYear, selectedMonth - 1);
+      const week = data.calendar
+        .filter((week) => week.includes(selectedDay))
+        .flat();
 
-    // Check if a previous or next month is in calendarjs
-    const hasZeros = week.some((value) => value === 0);
-    let prev = false;
-    let next = false;
-    let length = 0;
-    let newWeek = week;
+      // Check if a previous or next month is in calendarjs
+      const hasZeros = week.some((value) => value === 0);
+      let prev = false;
+      let next = false;
+      let length = 0;
+      let newWeek = week;
 
-    if (hasZeros) {
-      const filteredWeek = week.filter((day) => day !== 0);
-      length = week.filter((day) => day === 0).length;
+      if (hasZeros) {
+        const filteredWeek = week.filter((day) => day !== 0);
+        length = week.filter((day) => day === 0).length;
 
-      // Check if the 0 are at the beginning or end of the selected week
-      // Also check if its the next year or last year
-      if (week[0] === 0) {
-        prev = true;
-        let newMonth = selectedMonth - 2;
-        let newYear = selectedYear;
-        if (newMonth < 0) {
-          newMonth = 11 - Math.abs(selectedMonth - 2);
-          newYear--;
+        // Check if the 0 are at the beginning or end of the selected week
+        // Also check if its the next year or last year
+        if (week[0] === 0) {
+          prev = true;
+          let newMonth = selectedMonth - 2;
+          let newYear = selectedYear;
+          if (newMonth < 0) {
+            newMonth = 11;
+            newYear--;
+          }
+          const prevCal = cal.of(newYear, newMonth);
+          const prevWeek = prevCal.calendar[prevCal.calendar.length - 1];
+          const filteredPrevWeek = prevWeek.filter((day) => day !== 0);
+          newWeek = [filteredPrevWeek, filteredWeek].flat();
+        } else if (week[week.length - 1] === 0) {
+          next = true;
+          let newMonth = selectedMonth;
+          let newYear = selectedYear;
+          if (newMonth > 11) {
+            newMonth = 0;
+            newYear++;
+          }
+          const nextCal = cal.of(newYear, newMonth);
+          const nextWeek = nextCal.calendar[0];
+          const filteredNextWeek = nextWeek.filter((day) => day !== 0);
+          newWeek = [filteredWeek, filteredNextWeek].flat();
         }
-        const prevCal = cal.of(newYear, newMonth);
-        const prevWeek = prevCal.calendar[prevCal.calendar.length - 1];
-        const filteredPrevWeek = prevWeek.filter((day) => day !== 0);
-        newWeek = [filteredPrevWeek, filteredWeek].flat();
-      } else if (week[week.length - 1] === 0) {
-        next = true;
-        let newMonth = selectedMonth;
-        let newYear = selectedYear;
-        if (newMonth > 11) {
-          newMonth = 0 + selectedMonth;
-          newYear++;
-        }
-        const nextCal = cal.of(newYear, newMonth);
-        const nextWeek = nextCal.calendar[0];
-        const filteredNextWeek = nextWeek.filter((day) => day !== 0);
-        newWeek = [filteredWeek, filteredNextWeek].flat();
       }
-    }
 
-    setSelectedWeek({
-      weekDays: newWeek,
-      month: selectedMonth - 1,
-      year: selectedYear,
-      prevMonth: prev,
-      nextMonth: next,
-      otherDays: length,
-    });
+      setSelectedWeek({
+        weekDays: newWeek,
+        month: selectedMonth - 1,
+        year: selectedYear,
+        prevMonth: prev,
+        nextMonth: next,
+        otherDays: length,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }, [selectedDate]);
 
   // Get all tasks from between the start and end date
@@ -103,8 +111,14 @@ export default function Upcoming({ view }: Props) {
 
       if (db) {
         if (selectedWeek.nextMonth) {
+          let newYear = selectedWeek.year;
+          let newMonth = selectedWeek.month;
+          if (selectedWeek.month + 2 > 12) {
+            newMonth = 1;
+            newYear = selectedWeek.year + 1;
+          }
           const endISODate = new Date(
-            `${selectedWeek.year}-${String(selectedWeek.month + 2).padStart(2, "0")}-${selectedWeek.otherDays}`,
+            `${newYear}-${String(newMonth).padStart(2, "0")}-${selectedWeek.otherDays}`,
           )
             .toISOString()
             .slice(0, 10);
@@ -117,8 +131,19 @@ export default function Upcoming({ view }: Props) {
             },
           );
         } else if (selectedWeek.prevMonth) {
+          let newYear = selectedWeek.year;
+          let newMonth = selectedWeek.month;
+          if (selectedWeek.month < 1) {
+            newMonth = 12;
+            newYear = selectedWeek.year - 1;
+          }
+
+          const tempCal = cal.of(newYear, newMonth - 1);
+          const newDay = Math.max(
+            ...tempCal.calendar[tempCal.calendar.length - 1],
+          );
           const startISODate = new Date(
-            `${selectedWeek.year}-${String(selectedWeek.month).padStart(2, "0")}-${selectedWeek.otherDays}`,
+            `${newYear}-${String(newMonth).padStart(2, "0")}-${newDay - selectedWeek.otherDays + 1}`,
           )
             .toISOString()
             .slice(0, 10);
@@ -220,6 +245,7 @@ export default function Upcoming({ view }: Props) {
               tasks={upcomingTasks}
               selectedWeek={selectedWeek}
               view={view}
+              setIndirectData={setIndirectData}
             />
           )}
         </div>
@@ -273,6 +299,7 @@ export default function Upcoming({ view }: Props) {
               tasks={upcomingTasks}
               selectedWeek={selectedWeek}
               view={view}
+              setIndirectData={setIndirectData}
             />
           )}
         </div>

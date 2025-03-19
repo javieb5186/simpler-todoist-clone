@@ -14,6 +14,7 @@ import Overdue from "./components/Main/Overdue";
 
 export interface IndirectData {
   category?: string;
+  date?: string[];
 }
 
 const ModalChild = () => {
@@ -44,11 +45,18 @@ const ModalChild = () => {
             setIndirectData={setIndirectData}
           />
         )}
-        {main.upcoming && <Upcoming view={"board"} />}
+        {main.upcoming && (
+          <Upcoming view={"board"} setIndirectData={setIndirectData} />
+        )}
         {main.completed && <Completed />}
         {main.overdue && <Overdue />}
       </div>
-      {modal.addTask && <SaveTaskModal category={indirectData?.category} />}
+      {modal.addTask && (
+        <SaveTaskModal
+          category={indirectData?.category}
+          date={indirectData?.date}
+        />
+      )}
       {modal.search && <SearchModal />}
     </>
   );

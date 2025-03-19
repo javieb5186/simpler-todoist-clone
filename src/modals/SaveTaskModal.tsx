@@ -9,9 +9,10 @@ import saveDatabaseToLocalStorage from "../utils/saveDatabaseToLocalStorage";
 
 interface Props {
   category?: string;
+  date?: string[];
 }
 
-export default function SaveTaskModal({ category }: Props) {
+export default function SaveTaskModal({ category, date }: Props) {
   const { db, setFetch } = useDatabase();
   const [modal, setModal] = useModal();
   const [inputValue, setInputValue] = useState("");
@@ -19,7 +20,7 @@ export default function SaveTaskModal({ category }: Props) {
   const [categoryPopUp, setCategoryPopUp] = useState(false);
   const [calendarPopUp, setCalendarPopUp] = useState(false);
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toLocaleDateString().split("/"),
+    date || new Date().toLocaleDateString().split("/"),
   );
   const [selectedCategory, setSelectedCategory] = useState(category || "other");
   const [timePopup, setTimePopup] = useState(false);
