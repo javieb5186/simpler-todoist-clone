@@ -90,6 +90,7 @@ export default function Category({ category, view, setIndirectData }: Props) {
                     title={String(task[1])}
                     description={String(task[2])}
                     categoryId={Number(task[5])}
+                    date={String(task[3])}
                     view="list"
                   />
                 );
@@ -147,6 +148,7 @@ export default function Category({ category, view, setIndirectData }: Props) {
                     title={String(task[1])}
                     description={String(task[2])}
                     categoryId={Number(task[5])}
+                    date={String(task[3])}
                     view="board"
                   />
                 );

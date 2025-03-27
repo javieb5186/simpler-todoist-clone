@@ -3,11 +3,17 @@ import { createContext, Dispatch, ReactNode, useState } from "react";
 export type ModalContextProps = [
   modal: {
     addTask: boolean;
+    addTaskOptions?: {
+      id: number | undefined;
+    };
     search: boolean;
   },
   setModal: Dispatch<
     React.SetStateAction<{
       addTask: boolean;
+      addTaskOptions?: {
+        id: number | undefined;
+      };
       search: boolean;
     }>
   >,

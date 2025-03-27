@@ -6,6 +6,7 @@ import CalendarPopup from "../../PopUps/CalendarPopup";
 import RenderTasksToDays from "./RenderTasksToDays";
 import { SelectedWeek } from "./interface";
 import { IndirectData } from "../../../App";
+import { useModal } from "../../../contexts/useModalContext";
 
 interface Props {
   view: "list" | "board";
@@ -18,12 +19,14 @@ const cal = calendar();
 
 export default function Upcoming({ view, setIndirectData }: Props) {
   const { db } = useDatabase();
+  const [modal] = useModal();
   const [upcomingTasks, setUpcomingTasks] = useState<QueryExecResult[]>([]);
   const [calendarPopUp, setCalendarPopUp] = useState(false);
   const [selectedDate, setSelectedDate] = useState(
     new Date().toLocaleDateString().split("/"),
   );
   const [selectedWeek, setSelectedWeek] = useState<SelectedWeek>();
+  const [trigger, setTrigger] = useState(false);
 
   // Initial instance of cal creates the selected week.
   // Which defaults to today
@@ -89,6 +92,10 @@ export default function Upcoming({ view, setIndirectData }: Props) {
       console.log(error);
     }
   }, [selectedDate]);
+
+  useEffect(() => {
+    console.log(trigger);
+  }, [trigger]);
 
   // Get all tasks from between the start and end date
   useEffect(() => {
@@ -167,11 +174,7 @@ export default function Upcoming({ view, setIndirectData }: Props) {
         setUpcomingTasks(results);
       }
     }
-  }, [db, selectedWeek]);
-
-  useEffect(() => {
-    console.log(selectedWeek);
-  }, [selectedWeek]);
+  }, [db, selectedWeek, trigger, modal.addTask]);
 
   return (
     <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pb-4 pt-12 md:px-8">
@@ -246,6 +249,7 @@ export default function Upcoming({ view, setIndirectData }: Props) {
               selectedWeek={selectedWeek}
               view={view}
               setIndirectData={setIndirectData}
+              callback={() => setTrigger(!trigger)}
             />
           )}
         </div>
@@ -300,6 +304,7 @@ export default function Upcoming({ view, setIndirectData }: Props) {
               selectedWeek={selectedWeek}
               view={view}
               setIndirectData={setIndirectData}
+              callback={() => setTrigger(!trigger)}
             />
           )}
         </div>

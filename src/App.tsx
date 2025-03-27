@@ -55,6 +55,7 @@ const ModalChild = () => {
         <SaveTaskModal
           category={indirectData?.category}
           date={indirectData?.date}
+          taskId={modal.addTaskOptions?.id}
         />
       )}
       {modal.search && <SearchModal />}

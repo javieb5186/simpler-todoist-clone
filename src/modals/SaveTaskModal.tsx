@@ -8,11 +8,12 @@ import { useDatabase } from "../hooks/useDatabase";
 import saveDatabaseToLocalStorage from "../utils/saveDatabaseToLocalStorage";
 
 interface Props {
+  taskId?: number;
   category?: string;
   date?: string[];
 }
 
-export default function SaveTaskModal({ category, date }: Props) {
+export default function SaveTaskModal({ category, date, taskId }: Props) {
   const { db, setFetch } = useDatabase();
   const [modal, setModal] = useModal();
   const [inputValue, setInputValue] = useState("");
@@ -54,24 +55,55 @@ export default function SaveTaskModal({ category, date }: Props) {
 
         let prep;
         if (!selectedTime) {
-          prep = db.prepare(
-            "INSERT INTO tasks (title, description, set_date, category_id) VALUES(?, ?, ?, (SELECT id FROM task_categories WHERE name = ?));",
-          );
-          prep.run([inputValue, textAreaValue, dbDate, selectedCategory]);
+          if (taskId) {
+            prep = db.prepare(
+              "UPDATE tasks SET title = ?, description = ?, set_date = ?, category_id = ? WHERE id = ?",
+            );
+            prep.run([
+              inputValue,
+              textAreaValue,
+              dbDate,
+              selectedCategory,
+              taskId,
+            ]);
+          } else {
+            prep = db.prepare(
+              "INSERT INTO tasks (title, description, set_date, category_id) VALUES(?, ?, ?, (SELECT id FROM task_categories WHERE name = ?));",
+            );
+            prep.run([inputValue, textAreaValue, dbDate, selectedCategory]);
+          }
         } else {
-          prep = db.prepare(
-            "INSERT INTO tasks (title, description, set_date, set_time, category_id) VALUES(?, ?, ?, ?, (SELECT id FROM task_categories WHERE name = ?));",
-          );
-          prep.run([
-            inputValue,
-            textAreaValue,
-            dbDate,
-            dbTime,
-            selectedCategory,
-          ]);
+          if (taskId) {
+            prep = db.prepare(
+              "UPDATE tasks SET title = ?, description = ?, set_date = ?, set_time = ?, category_id = (SELECT id FROM task_categories WHERE name = ?) WHERE id = ?",
+            );
+            prep.run([
+              inputValue,
+              textAreaValue,
+              dbDate,
+              dbTime,
+              selectedCategory,
+              taskId,
+            ]);
+          } else {
+            prep = db.prepare(
+              "INSERT INTO tasks (title, description, set_date, set_time, category_id) VALUES(?, ?, ?, ?, (SELECT id FROM task_categories WHERE name = ?));",
+            );
+            prep.run([
+              inputValue,
+              textAreaValue,
+              dbDate,
+              dbTime,
+              selectedCategory,
+            ]);
+          }
         }
         saveDatabaseToLocalStorage(db);
-        setModal({ ...modal, addTask: false });
+        setModal({
+          ...modal,
+          addTask: false,
+          addTaskOptions: { id: undefined },
+        });
         setFetch();
       }
     } catch (error) {
@@ -83,12 +115,55 @@ export default function SaveTaskModal({ category, date }: Props) {
     setDisabled(!inputValue.length || !textAreaValue.length);
   }, [inputValue, textAreaValue]);
 
+  useEffect(() => {
+    try {
+      if (db && taskId) {
+        const results = db.exec("SELECT * FROM tasks WHERE id = $id", {
+          $id: taskId,
+        });
+        const data = results[0].values[0];
+        setInputValue(String(data[1]));
+        setTextAreaValue(String(data[2]));
+        const date = String(data[3]).split("-");
+        const newDate = new Date(
+          Number(date[0]),
+          Number(date[1]) - 1,
+          Number(date[2]),
+        );
+        setSelectedDate(newDate.toLocaleDateString().split("/"));
+        const categoryResults = db.exec(
+          "SELECT name FROM task_categories WHERE id = $categoryId",
+          { $categoryId: Number(data[5]) },
+        );
+        const category = categoryResults[0].values[0];
+        setSelectedCategory(String(category[0]));
+
+        if (String(data[4]).includes("undefined") !== true) {
+          const time = String(data[4]);
+          const newTime = time.split(/[ :]+/);
+          const newDate = new Date(
+            2025,
+            1,
+            1,
+            Number(newTime[0]),
+            Number(newTime[1]),
+          );
+          const localeTime = newDate.toLocaleTimeString();
+          const newSplit = localeTime.split(/[ :]+/);
+          const finalTime = [newSplit[0], newSplit[1], newSplit[3]];
+          setSelectedTime(finalTime);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [taskId]);
+
   return (
     <Modal onClose={() => setModal({ ...modal, addTask: false })}>
       <div
         className="flex flex-col"
         onClick={() => {
-          console.log("closing");
           setCalendarPopUp(false);
           setCategoryPopUp(false);
           setTimePopup(false);
@@ -201,7 +276,13 @@ export default function SaveTaskModal({ category, date }: Props) {
           <div className="space-x-2">
             <button
               className="rounded border border-black p-1"
-              onClick={() => setModal({ ...modal, addTask: false })}
+              onClick={() =>
+                setModal({
+                  ...modal,
+                  addTask: false,
+                  addTaskOptions: { id: undefined },
+                })
+              }
             >
               Cancel
             </button>

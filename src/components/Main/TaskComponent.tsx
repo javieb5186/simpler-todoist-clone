@@ -3,12 +3,14 @@ import { useDatabase } from "../../hooks/useDatabase";
 import useWindowWidth from "../../hooks/useWindowWidth";
 import { Database } from "sql.js";
 import saveDatabaseToLocalStorage from "../../utils/saveDatabaseToLocalStorage";
+import { useModal } from "../../contexts/useModalContext";
 
 interface TaskProps {
   taskId: number;
   title: string;
   description: string;
   categoryId: number;
+  date: string;
   view: "list" | "board";
   onClickCallback?: () => void;
 }
@@ -35,10 +37,12 @@ const TaskComponent = ({
   title,
   description,
   categoryId,
+  date,
   view,
   onClickCallback,
 }: TaskProps) => {
   const { db } = useDatabase();
+  const [modal, setModal] = useModal();
   const width = useWindowWidth();
   const [categoryStr, setCategoryStr] = useState("");
   const [hover, setHover] = useState(false);
@@ -108,7 +112,15 @@ const TaskComponent = ({
           <div
             className={`flex flex-none space-x-2 *:px-2 *:py-1 ${contentHover || width < 640 ? "block" : "hidden"}`}
           >
-            <button>
+            <button
+              onClick={() =>
+                setModal({
+                  ...modal,
+                  addTask: true,
+                  addTaskOptions: { id: taskId },
+                })
+              }
+            >
               <svg
                 className="h-4 w-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +136,10 @@ const TaskComponent = ({
           </div>
         </div>
         <p>{description}</p>
-        <span className="self-end">{categoryStr}</span>
+        <div className="flex justify-between pb-2">
+          <div>{date}</div>
+          <span className="self-end">{categoryStr}</span>
+        </div>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ interface RenderTasks {
   setIndirectData: React.Dispatch<
     React.SetStateAction<IndirectData | undefined>
   >;
+  callback: () => void;
 }
 
 export default function RenderTasksToDays({
@@ -20,6 +21,7 @@ export default function RenderTasksToDays({
   selectedWeek,
   view,
   setIndirectData,
+  callback,
 }: RenderTasks) {
   const week = [
     "Sunday",
@@ -75,7 +77,9 @@ export default function RenderTasksToDays({
                               title={String(task[1])}
                               description={String(task[2])}
                               categoryId={Number(task[5])}
+                              date={String(task[3])}
                               view={view}
+                              onClickCallback={() => callback()}
                             />
                           );
                         })}
@@ -111,6 +115,7 @@ export default function RenderTasksToDays({
                     const dateArr = newDate.toLocaleDateString().split("/");
                     setIndirectData({ date: dateArr });
                     setModal({ ...modal, addTask: true });
+                    callback();
                   }}
                 >
                   <svg
@@ -124,7 +129,7 @@ export default function RenderTasksToDays({
                     Fonticons, Inc.
                     <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z" />
                   </svg>
-                  <span>Add Task</span>
+                  <span>Add h Task</span>
                 </button>
               </div>
             );
@@ -158,7 +163,9 @@ export default function RenderTasksToDays({
                               title={String(task[1])}
                               description={String(task[2])}
                               categoryId={Number(task[5])}
+                              date={String(task[3])}
                               view={view}
+                              onClickCallback={() => callback()}
                             />
                           );
                         })}
@@ -166,7 +173,10 @@ export default function RenderTasksToDays({
                     );
                   }
                 })}
-                <button className="flex items-center gap-x-2 py-2 pr-4">
+                <button
+                  className="flex items-center gap-x-2 py-2 pr-4"
+                  onClick={() => callback()}
+                >
                   <svg
                     className="h-4 w-4 fill-[#DC4C3E]"
                     xmlns="http://www.w3.org/2000/svg"
