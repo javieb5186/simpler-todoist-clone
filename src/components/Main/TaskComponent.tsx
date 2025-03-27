@@ -4,6 +4,7 @@ import useWindowWidth from "../../hooks/useWindowWidth";
 import { Database } from "sql.js";
 import saveDatabaseToLocalStorage from "../../utils/saveDatabaseToLocalStorage";
 import { useModal } from "../../contexts/useModalContext";
+import { useUpdate } from "../../contexts/UpdateContext";
 
 interface TaskProps {
   taskId: number;
@@ -11,8 +12,7 @@ interface TaskProps {
   description: string;
   categoryId: number;
   date: string;
-  view: "list" | "board";
-  onClickCallback?: () => void;
+  onComplete?: () => void;
 }
 
 function updateCompleted(database: Database | null, taskId: number) {
@@ -38,11 +38,11 @@ const TaskComponent = ({
   description,
   categoryId,
   date,
-  view,
-  onClickCallback,
+  onComplete,
 }: TaskProps) => {
   const { db } = useDatabase();
   const [modal, setModal] = useModal();
+  const [update, setUpdate] = useUpdate();
   const width = useWindowWidth();
   const [categoryStr, setCategoryStr] = useState("");
   const [hover, setHover] = useState(false);
@@ -50,7 +50,8 @@ const TaskComponent = ({
 
   const handleCompleted = () => {
     updateCompleted(db, taskId);
-    if (onClickCallback) onClickCallback();
+    setUpdate(!update);
+    if (onComplete) onComplete();
   };
 
   // Get category based on id and display
@@ -67,11 +68,13 @@ const TaskComponent = ({
     } catch (error) {
       if (error) console.log(error);
     }
-  }, [categoryId, db]);
+  }, [categoryId, db, update]);
 
   return (
     <div
-      className={`relative flex w-full items-start justify-start gap-x-2 ${view === "list" ? "border-b border-neutral-400" : "max-w-[20rem] rounded border border-neutral-800 p-2 drop-shadow"}`}
+      className={
+        "relative flex w-full items-start justify-start gap-x-2 border-b border-neutral-400"
+      }
     >
       <button
         onClick={handleCompleted}

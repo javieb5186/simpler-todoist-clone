@@ -35,18 +35,12 @@ export default function Completed() {
           }
           return true;
         });
-        // If it is, remove from database and from results
-        console.log("results", newResults);
         setCompletedTasks(newResults);
       }
     } catch (error) {
       if (error) console.log(error);
     }
   }, [db]);
-
-  // useEffect(() => {
-  //   console.log(completedTasks);
-  // }, [completedTasks]);
 
   return (
     <div className="relative h-screen min-w-80 flex-1 space-y-8 overflow-y-auto px-2 pb-4 pt-12 md:px-8">

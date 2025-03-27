@@ -2,9 +2,11 @@ import { SqlValue } from "sql.js";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useEffect, useState } from "react";
 import TaskComponent from "./TaskComponent";
+import { useUpdate } from "../../contexts/UpdateContext";
 
 export default function Overdue() {
   const { db } = useDatabase();
+  const [update, setUpdate] = useUpdate();
   const [overdueTasks, setOverdueTasks] = useState<SqlValue[][]>();
 
   useEffect(() => {
@@ -32,11 +34,7 @@ export default function Overdue() {
     } catch (error) {
       console.log(error);
     }
-  }, [db]);
-
-  useEffect(() => {
-    console.log(overdueTasks);
-  }, [overdueTasks]);
+  }, [db, update]);
 
   return (
     <div className="relative h-screen min-w-80 flex-1 space-y-8 overflow-y-auto px-2 pb-4 pt-12 md:px-8">
@@ -54,7 +52,7 @@ export default function Overdue() {
                   description={String(task[2])}
                   categoryId={Number(task[5])}
                   date={String(task[3])}
-                  view={"list"}
+                  onComplete={() => setUpdate(!update)}
                 />
               </div>
             );

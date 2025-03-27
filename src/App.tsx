@@ -5,12 +5,13 @@ import ModalProvider from "./contexts/ModalProvider";
 import { useModal } from "./contexts/useModalContext";
 import SaveTaskModal from "./modals/SaveTaskModal";
 import SearchModal from "./modals/SearchModal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Category from "./components/Main/Category";
 import Upcoming from "./components/Main/Upcoming/Upcoming";
 import Completed from "./components/Main/Completed";
 import Search from "./components/Main/Search";
 import Overdue from "./components/Main/Overdue";
+import UpdateProvider from "./contexts/UpdateProvider";
 
 export interface IndirectData {
   category?: string;
@@ -29,9 +30,6 @@ const ModalChild = () => {
   });
   const [indirectData, setIndirectData] = useState<IndirectData | undefined>();
 
-  useEffect(() => {
-    console.log(main);
-  }, [main]);
   return (
     <>
       <div className="flex">
@@ -41,13 +39,10 @@ const ModalChild = () => {
         {main.category.length > 0 && (
           <Category
             category={main.category}
-            view={"list"}
             setIndirectData={setIndirectData}
           />
         )}
-        {main.upcoming && (
-          <Upcoming view={"board"} setIndirectData={setIndirectData} />
-        )}
+        {main.upcoming && <Upcoming setIndirectData={setIndirectData} />}
         {main.completed && <Completed />}
         {main.overdue && <Overdue />}
       </div>
@@ -56,6 +51,7 @@ const ModalChild = () => {
           category={indirectData?.category}
           date={indirectData?.date}
           taskId={modal.addTaskOptions?.id}
+          setIndirectData={setIndirectData}
         />
       )}
       {modal.search && <SearchModal />}
@@ -66,9 +62,11 @@ const ModalChild = () => {
 export default function App() {
   return (
     <DatabaseProvider>
-      <ModalProvider>
-        <ModalChild />
-      </ModalProvider>
+      <UpdateProvider>
+        <ModalProvider>
+          <ModalChild />
+        </ModalProvider>
+      </UpdateProvider>
     </DatabaseProvider>
   );
 }

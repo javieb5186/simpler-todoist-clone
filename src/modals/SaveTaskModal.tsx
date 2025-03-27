@@ -6,16 +6,27 @@ import CalendarPopup from "../components/PopUps/CalendarPopup";
 import TimePopup from "../components/PopUps/TimePopup";
 import { useDatabase } from "../hooks/useDatabase";
 import saveDatabaseToLocalStorage from "../utils/saveDatabaseToLocalStorage";
+import { useUpdate } from "../contexts/UpdateContext";
+import { IndirectData } from "../App";
 
 interface Props {
   taskId?: number;
   category?: string;
   date?: string[];
+  setIndirectData: React.Dispatch<
+    React.SetStateAction<IndirectData | undefined>
+  >;
 }
 
-export default function SaveTaskModal({ category, date, taskId }: Props) {
+export default function SaveTaskModal({
+  category,
+  date,
+  taskId,
+  setIndirectData,
+}: Props) {
   const { db, setFetch } = useDatabase();
   const [modal, setModal] = useModal();
+  const [update, setUpdate] = useUpdate();
   const [inputValue, setInputValue] = useState("");
   const [textAreaValue, setTextAreaValue] = useState("");
   const [categoryPopUp, setCategoryPopUp] = useState(false);
@@ -105,6 +116,7 @@ export default function SaveTaskModal({ category, date, taskId }: Props) {
           addTaskOptions: { id: undefined },
         });
         setFetch();
+        setUpdate(!update);
       }
     } catch (error) {
       console.log(error);
@@ -276,13 +288,14 @@ export default function SaveTaskModal({ category, date, taskId }: Props) {
           <div className="space-x-2">
             <button
               className="rounded border border-black p-1"
-              onClick={() =>
+              onClick={() => {
                 setModal({
                   ...modal,
                   addTask: false,
                   addTaskOptions: { id: undefined },
-                })
-              }
+                });
+                setIndirectData(undefined);
+              }}
             >
               Cancel
             </button>

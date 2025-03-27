@@ -1,6 +1,7 @@
 import { SqlValue } from "sql.js";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useState, useEffect } from "react";
+import { useUpdate } from "../../contexts/UpdateContext";
 
 interface CategoryButtonProps {
   category: SqlValue;
@@ -10,6 +11,7 @@ interface CategoryButtonProps {
 const CategoryButton = ({ category, onClick }: CategoryButtonProps) => {
   const { db } = useDatabase();
   const [counter, setCounter] = useState(0);
+  const [update] = useUpdate();
 
   // Get amount of tasks based on category, set on task
   useEffect(() => {
@@ -21,9 +23,11 @@ const CategoryButton = ({ category, onClick }: CategoryButtonProps) => {
 
       if (result[0]) {
         setCounter(result[0].values.length);
+      } else {
+        setCounter(0);
       }
     }
-  }, [category, db]);
+  }, [category, db, update]);
 
   return (
     <button
@@ -31,9 +35,7 @@ const CategoryButton = ({ category, onClick }: CategoryButtonProps) => {
       className="flex justify-between py-2"
       onClick={onClick}
     >
-      <span>
-        {String(category)[0].toUpperCase() + String(category).slice(1)}
-      </span>
+      <span>{String(category)}</span>
       <span>{counter}</span>
     </button>
   );

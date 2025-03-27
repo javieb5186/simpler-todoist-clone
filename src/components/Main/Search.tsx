@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { useDatabase } from "../../hooks/useDatabase";
 import TaskComponent from "./TaskComponent";
 import { QueryExecResult } from "sql.js";
+import { useUpdate } from "../../contexts/UpdateContext";
 
 export default function Search() {
   const { db } = useDatabase();
+  const [update, setUpdate] = useUpdate();
   const [input, setInput] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -46,7 +48,7 @@ export default function Search() {
       );
       setSearchedTasks(results);
     }
-  }, [db, debouncedValue]);
+  }, [db, debouncedValue, update]);
 
   useEffect(() => {
     if (debouncedSearch && db) {
@@ -109,12 +111,13 @@ export default function Search() {
                 searchedTasks[0].values.map((task) => {
                   return (
                     <TaskComponent
-                      key={String(task[1])}
+                      key={String(task[0])}
                       taskId={Number(task[0])}
                       title={String(task[1])}
                       description={String(task[2])}
                       categoryId={Number(task[5])}
-                      view="list"
+                      date={String(task[3])}
+                      onComplete={() => setUpdate(!update)}
                     />
                   );
                 })}
