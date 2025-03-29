@@ -2,9 +2,9 @@ import { QueryExecResult } from "sql.js";
 import { SelectedWeek } from "./interface";
 import { Fragment } from "react/jsx-runtime";
 import TaskComponent from "../TaskComponent";
-import { useEffect } from "react";
 import { IndirectData } from "../../../App";
 import { useModal } from "../../../contexts/useModalContext";
+import useWindowWidth from "../../../hooks/useWindowWidth";
 
 interface RenderTasks {
   tasks: QueryExecResult[];
@@ -22,27 +22,25 @@ export default function RenderTasksToDays({
   callback,
 }: RenderTasks) {
   const week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
   const [modal, setModal] = useModal();
-
-  useEffect(() => {
-    console.log(selectedWeek);
-  }, [selectedWeek]);
+  const width = useWindowWidth();
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-7 gap-x-2 divide-x divide-neutral-400 border border-black">
-        {week.map((day, index) => {
-          return (
-            <div key={day} className="space-y-4">
-              <div className="space-x-2 text-center">
-                <span>{day}</span>
-                <span>{selectedWeek.weekDays[index]}</span>
+      {width > 767 && (
+        <div className="grid grid-cols-7 gap-x-2 divide-x divide-neutral-400 border border-black">
+          {week.map((day, index) => {
+            return (
+              <div key={day} className="space-y-4">
+                <div className="space-x-2 text-center">
+                  <span>{day}</span>
+                  <span>{selectedWeek.weekDays[index]}</span>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
       <div className="space-y-8">
         {week.map((day, index) => {
           return (

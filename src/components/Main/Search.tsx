@@ -54,8 +54,9 @@ export default function Search() {
     if (debouncedSearch && db) {
       if (savedSearches.length > 0) {
         if (
-          savedSearches[0].values.some((val) => val[1] !== debouncedSearch) ===
-          true
+          savedSearches[0].values.some(
+            (val) => String(val[1]) === debouncedSearch,
+          ) === false
         ) {
           db.run("INSERT INTO searches (search) VALUES (?);", [
             debouncedSearch,
@@ -123,7 +124,7 @@ export default function Search() {
                 })}
             </>
           ) : (
-            <div className="flex flex-wrap gap-x-2">
+            <div className="flex flex-wrap gap-2">
               {savedSearches.length > 0 &&
                 savedSearches[0].values.map((search, index) => {
                   return (

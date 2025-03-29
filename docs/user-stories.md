@@ -55,18 +55,7 @@
 #### **Acceptance Criteria**
 
 - A category popup can open
-- Includes: A search for faster selection and categories
-
-### Search
-
-**As a** customer,
-**I want** to have a search popup,  
-**so that** I can quickly find keywords in categories, tasks, or description.
-
-#### **Acceptance Criteria**
-
-- A search popup can open
-- Includes: An input for typing and recently viewed
+- If applicable: A search for faster selection and categories
 
 ### Calendar
 
@@ -78,22 +67,7 @@
 
 - A calendar popup can open
 - Can navigate back and forth to different months
-- Has a center button to go to today and current month
-- Has dots for hints that there are tasks for that day.
 - Past days are disabled
-
-### View
-
-**As a** customer,
-**I want** to have a view popup,  
-**so that** whenever I want to, I can sort or change layout.
-
-#### **Acceptance Criteria**
-
-- A view popup can open
-- Can select between list and board view
-- Can select type of sorting
-- Can select asc or dsc.
 
 ### Edit
 
@@ -132,8 +106,7 @@
 
 - Main renders completed tasks when clicking completed
 - Displays a history of completed tasks
-- Save history for 7 days
-- Can load more when needed
+- Save history for 1 day
 
 ## Core Functionality
 
@@ -170,7 +143,6 @@
 
 - All tasks have a button to complete it.
 - Completing tasks will move it to completed
-- Can revert action if mispressed
 
 **As a** customer,
 **I want** to be able to edit any task,  
@@ -179,17 +151,18 @@
 #### **Acceptance Criteria**
 
 - All tasks have an edit button which opens edit modal.
-- Pressing any button, will open the corresponding modal
+- Pressing any button, will open the modal with filled data.
+
+### Search
 
 **As a** customer,
-**I want** to be able to expand board tasks,  
-**so that** I can easily view all the content for the task.
+**I want** to have a search functionality,  
+**so that** I can quickly find keywords in tasks.
 
 #### **Acceptance Criteria**
 
-- All tasks in board view are clickable.
-- Clicking expands the card to display all content
-- Clicking a different card or away minimizes the expanded card
+- A search renders in main
+- Includes: An input for typing and recently viewed
 
 ### Responsive
 
@@ -201,16 +174,3 @@
 
 - App is reponsive to smallest mobile device.
 - Sidebar is false toggled by default for mobile
-
-### Accessible
-
-**As a** customer with disablities,
-**I want** todoist to be accessible,  
-**so that** I can use the app despite my inabilities
-
-#### **Acceptance Criteria**
-
-- App is keyboard navigable.
-- App contains semantic elements and attributes
-- Screen Reader passable
-- Keyboard and focus trapping where possible

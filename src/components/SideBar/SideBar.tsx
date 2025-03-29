@@ -134,7 +134,12 @@ export default function SideBar({ setState }: Props) {
           </div>
           <button
             className="flex items-center gap-x-2"
-            onClick={() => setState({ ...reset, search: true })}
+            onClick={() => {
+              setState({ ...reset, search: true });
+              if (width < 767) {
+                setActive(!active);
+              }
+            }}
           >
             <svg
               className="h-6 w-6"
@@ -150,7 +155,12 @@ export default function SideBar({ setState }: Props) {
           </button>
           <button
             className="flex items-center gap-x-2"
-            onClick={() => setState({ ...reset, today: true })}
+            onClick={() => {
+              setState({ ...reset, today: true });
+              if (width < 767) {
+                setActive(!active);
+              }
+            }}
           >
             <svg
               className="h-6 w-6"
@@ -166,7 +176,12 @@ export default function SideBar({ setState }: Props) {
           </button>
           <button
             className="flex items-center gap-x-2"
-            onClick={() => setState({ ...reset, upcoming: true })}
+            onClick={() => {
+              setState({ ...reset, upcoming: true });
+              if (width < 767) {
+                setActive(!active);
+              }
+            }}
           >
             <svg
               className="h-6 w-6"
@@ -182,7 +197,12 @@ export default function SideBar({ setState }: Props) {
           </button>
           <button
             className="flex items-center gap-x-2"
-            onClick={() => setState({ ...reset, completed: true })}
+            onClick={() => {
+              setState({ ...reset, completed: true });
+              if (width < 767) {
+                setActive(!active);
+              }
+            }}
           >
             <svg
               className="h-6 w-6"
@@ -198,7 +218,12 @@ export default function SideBar({ setState }: Props) {
           </button>
           <button
             className="flex items-center gap-x-2"
-            onClick={() => setState({ ...reset, overdue: true })}
+            onClick={() => {
+              setState({ ...reset, overdue: true });
+              if (width < 767) {
+                setActive(!active);
+              }
+            }}
           >
             <svg
               className="h-6 w-6"
@@ -220,9 +245,12 @@ export default function SideBar({ setState }: Props) {
               <CategoryButton
                 key={index}
                 category={category}
-                onClick={() =>
-                  setState({ ...reset, category: String(category) })
-                }
+                onClick={() => {
+                  setState({ ...reset, category: String(category) });
+                  if (width < 767) {
+                    setActive(!active);
+                  }
+                }}
               />
             );
           })}

@@ -14,18 +14,16 @@ Tools
 
 - Git/GitHub: For version control and collaboration.
 - Vite: For a fast, modern development environment.
-- Jest: For unit and integration testing.
 - Figma: For UI/UX design and prototyping.
-- Jira: For Agile project management and task tracking.
-- Lighthouse: For auditing SEO, performance, and accessibility.
 - ESLint/Prettier: For enforcing code quality and formatting.
 - Vercel: For deploying your application.
-- IndexDB: For fast and no installation database.
-- WAVE: For additional accessibility audits.
+- Sql.js: NPM Package for front end database.
+- Calendar.js: Enhanced calendar written in vanilla js.
 
 ## How to Run
 
 1. Install dependencies: `npm install`
 2. Start the development server: `npm run dev`
-3. Run JSON Server: `npm run server`
-4. Run tests: `npm test`
+3. Run Server: `npm run server`
+4. Open google chrome
+5. Navigate to: `localhost:5173`
