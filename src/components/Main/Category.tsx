@@ -67,6 +67,7 @@ export default function Category({ category, setIndirectData }: Props) {
                   description={String(task[2])}
                   categoryId={Number(task[5])}
                   date={String(task[3])}
+                  time={String(task[4])}
                   onComplete={() => setUpdate(!update)}
                 />
               );

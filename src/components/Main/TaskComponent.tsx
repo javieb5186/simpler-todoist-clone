@@ -12,6 +12,7 @@ interface TaskProps {
   description: string;
   categoryId: number;
   date: string;
+  time: string;
   onComplete?: () => void;
 }
 
@@ -38,6 +39,7 @@ const TaskComponent = ({
   description,
   categoryId,
   date,
+  time,
   onComplete,
 }: TaskProps) => {
   const { db } = useDatabase();
@@ -140,7 +142,10 @@ const TaskComponent = ({
         </div>
         <p>{description}</p>
         <div className="flex justify-between pb-2">
-          <div>{date}</div>
+          <div className="flex gap-x-2">
+            <p>{date}</p>
+            <p>{time.includes("undefined") !== true && time}</p>
+          </div>
           <span className="self-end">{categoryStr}</span>
         </div>
       </div>
