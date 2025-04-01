@@ -118,9 +118,7 @@ export default function SaveTaskModal({
         setFetch();
         setUpdate(!update);
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -166,9 +164,7 @@ export default function SaveTaskModal({
           setSelectedTime(finalTime);
         }
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }, [taskId]);
 
   return (

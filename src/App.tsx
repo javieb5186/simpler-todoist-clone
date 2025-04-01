@@ -4,7 +4,6 @@ import { DatabaseProvider } from "./contexts/DatabaseProvider";
 import ModalProvider from "./contexts/ModalProvider";
 import { useModal } from "./contexts/useModalContext";
 import SaveTaskModal from "./modals/SaveTaskModal";
-import SearchModal from "./modals/SearchModal";
 import { useState } from "react";
 import Category from "./components/Main/Category";
 import Upcoming from "./components/Main/Upcoming/Upcoming";

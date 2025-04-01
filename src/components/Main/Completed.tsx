@@ -13,33 +13,34 @@ export default function Completed() {
         const results = db.exec("SELECT * FROM tasks WHERE is_completed = ?", [
           1,
         ]);
-        // In here check to see if the task is more than one week old
-        const newResults = results[0].values.filter((task) => {
-          const taskDate = String(task[7]).split(", ")[0].split("/");
-          const checkDate = new Date(
-            Number(taskDate[2]),
-            Number(taskDate[0]) - 1,
-            Number(taskDate[1]),
-          );
-          const currentDate = new Date();
-          const reducedDate = currentDate.toLocaleDateString().split("/");
-          const expiredDate = new Date(
-            Number(reducedDate[2]),
-            Number(reducedDate[0]) - 1,
-            Number(reducedDate[1]),
-          );
-          if (checkDate < expiredDate) {
-            db.run("DELETE FROM tasks WHERE id = ?", [Number(task[0])]);
-            saveDatabaseToLocalStorage(db);
-            return false;
-          }
-          return true;
-        });
-        setCompletedTasks(newResults);
+
+        if (results[0]) {
+          // In here check to see if the task is more than one week old
+          const newResults = results[0].values.filter((task) => {
+            const taskDate = String(task[7]).split(", ")[0].split("/");
+            const checkDate = new Date(
+              Number(taskDate[2]),
+              Number(taskDate[0]) - 1,
+              Number(taskDate[1]),
+            );
+            const currentDate = new Date();
+            const reducedDate = currentDate.toLocaleDateString().split("/");
+            const expiredDate = new Date(
+              Number(reducedDate[2]),
+              Number(reducedDate[0]) - 1,
+              Number(reducedDate[1]),
+            );
+            if (checkDate < expiredDate) {
+              db.run("DELETE FROM tasks WHERE id = ?", [Number(task[0])]);
+              saveDatabaseToLocalStorage(db);
+              return false;
+            }
+            return true;
+          });
+          setCompletedTasks(newResults);
+        }
       }
-    } catch (error) {
-      if (error) console.log(error);
-    }
+    } catch (error) {}
   }, [db]);
 
   return (

@@ -40,9 +40,7 @@ export const DatabaseProvider = ({ children }: Props) => {
           saveDatabaseToLocalStorage(database);
         }
         setDb(database);
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (error) {}
     };
 
     setupDatabase();

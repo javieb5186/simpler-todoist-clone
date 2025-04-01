@@ -28,9 +28,7 @@ export default function Category({ category, setIndirectData }: Props) {
         );
         setCategoryTasks(results);
       }
-    } catch (error) {
-      if (error) console.log(error);
-    }
+    } catch (error) {}
   }, [db, category, update]);
 
   return (

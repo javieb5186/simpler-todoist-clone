@@ -88,14 +88,8 @@ export default function Upcoming({ setIndirectData }: Props) {
         nextMonth: next,
         otherDays: length,
       });
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }, [selectedDate]);
-
-  useEffect(() => {
-    console.log("selected week", selectedWeek);
-  }, [selectedWeek]);
 
   // Get all tasks from between the start and end date
   useEffect(() => {
@@ -130,10 +124,6 @@ export default function Upcoming({ setIndirectData }: Props) {
             .toISOString()
             .slice(0, 10);
 
-          console.log("if");
-          console.log("start", startISODate);
-          console.log("end", endISODate);
-
           results = db.exec(
             "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate AND is_completed != 1;",
             {
@@ -159,10 +149,6 @@ export default function Upcoming({ setIndirectData }: Props) {
             .toISOString()
             .slice(0, 10);
 
-          console.log("else if");
-          console.log("start", startISODate);
-          console.log("end", endISODate);
-
           results = db.exec(
             "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate AND is_completed != 1;",
             {
@@ -171,10 +157,6 @@ export default function Upcoming({ setIndirectData }: Props) {
             },
           );
         } else {
-          console.log("else");
-          console.log("start", startISODate);
-          console.log("end", endISODate);
-
           results = db.exec(
             "SELECT * FROM tasks WHERE set_date BETWEEN $startDate AND $endDate AND is_completed != 1;",
             {

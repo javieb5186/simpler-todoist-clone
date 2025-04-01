@@ -31,9 +31,7 @@ export default function Overdue() {
 
         setOverdueTasks(filteredResults);
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }, [db, update]);
 
   return (

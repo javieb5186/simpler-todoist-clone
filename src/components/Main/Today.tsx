@@ -29,14 +29,8 @@ export default function Today() {
         );
         setTodaysTasks(results);
       }
-    } catch (error) {
-      if (error) console.log(error);
-    }
+    } catch (error) {}
   }, [db, fetch, update]);
-
-  useEffect(() => {
-    console.log(todaysTasks);
-  }, [todaysTasks]);
 
   return (
     <div className="relative h-screen min-w-80 flex-1 overflow-y-auto px-2 pb-4 pt-12 md:px-8">

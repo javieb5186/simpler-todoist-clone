@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useModal } from "../contexts/useModalContext";
 import Modal from "./Modal";
 import { useDatabase } from "../hooks/useDatabase";
@@ -60,9 +59,7 @@ export default function ConfirmModal({ main, setMain }: Props) {
           confirmOptions: undefined,
         });
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   return (

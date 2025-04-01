@@ -28,9 +28,7 @@ function updateCompleted(database: Database | null, taskId: number) {
       ]);
       saveDatabaseToLocalStorage(db);
     }
-  } catch (error) {
-    if (error) console.log(error);
-  }
+  } catch (error) {}
 }
 
 const TaskComponent = ({
@@ -89,9 +87,7 @@ const TaskComponent = ({
         const capitializeStr = str[0].toUpperCase() + str.slice(1);
         setCategoryStr(capitializeStr);
       }
-    } catch (error) {
-      if (error) console.log(error);
-    }
+    } catch (error) {}
   }, [categoryId, db, update]);
 
   return (
