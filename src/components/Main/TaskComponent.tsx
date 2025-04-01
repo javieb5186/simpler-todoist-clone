@@ -50,6 +50,28 @@ const TaskComponent = ({
   const [hover, setHover] = useState(false);
   const [contentHover, setContentHover] = useState(false);
 
+  const splitDate = date.split("-");
+  const firstSplit = splitDate.shift();
+  splitDate.push((firstSplit && firstSplit) || "");
+  const [formattedDate] = useState(splitDate.join("/"));
+
+  const [formattedTime, setFormattedTime] = useState("");
+
+  useEffect(() => {
+    if (!time.includes("undefined")) {
+      const splitTime = time.split(":");
+
+      let amPm = "AM";
+      let hour = Number(splitTime[0]);
+      if (Number(splitTime[0]) > 12) {
+        amPm = "PM";
+        hour = Number(splitTime[0]) - 12;
+      }
+
+      setFormattedTime(`${hour}:${splitTime[1]} ${amPm}`);
+    }
+  }, []);
+
   const handleCompleted = () => {
     updateCompleted(db, taskId);
     setUpdate(!update);
@@ -143,8 +165,8 @@ const TaskComponent = ({
         <p>{description}</p>
         <div className="flex justify-between pb-2">
           <div className="flex gap-x-2">
-            <p>{date}</p>
-            <p>{time.includes("undefined") !== true && time}</p>
+            <p>{formattedDate}</p>
+            <p>{!time.includes("undefined") && formattedTime}</p>
           </div>
           <span className="self-end">{categoryStr}</span>
         </div>

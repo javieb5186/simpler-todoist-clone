@@ -5,6 +5,7 @@ import saveDatabaseToLocalStorage from "../../utils/saveDatabaseToLocalStorage";
 import useWindowWidth from "../../hooks/useWindowWidth";
 import CategoryButton from "./CategoryButton";
 import { useModal } from "../../contexts/useModalContext";
+import { useUpdate } from "../../contexts/UpdateContext";
 
 const reset = {
   search: false,
@@ -38,7 +39,7 @@ export default function SideBar({ setState }: Props) {
   const [categories, setCategories] = useState<SqlValue[] | undefined>(
     undefined,
   );
-  const [trigger, setTrigger] = useState(false);
+  const [trigger, setTrigger] = useUpdate();
 
   // Update database and ui when user pressed enter on Add Category button.
   const handleCategory = (e: KeyboardEvent<HTMLInputElement>) => {

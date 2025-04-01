@@ -7,6 +7,9 @@ export type ModalContextProps = [
       id: number | undefined;
     };
     search: boolean;
+    confirmOptions?: {
+      category: string;
+    };
   },
   setModal: Dispatch<
     React.SetStateAction<{
@@ -15,6 +18,9 @@ export type ModalContextProps = [
         id: number | undefined;
       };
       search: boolean;
+      confirmOptions?: {
+        category: string;
+      };
     }>
   >,
 ];

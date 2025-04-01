@@ -69,17 +69,6 @@
 - Can navigate back and forth to different months
 - Past days are disabled
 
-### Edit
-
-**As a** customer,
-**I want** to have a edit popup,  
-**so that** whenever I want to, I can edit the detail of the item I selected.
-
-#### **Acceptance Criteria**
-
-- An edit popup can open
-- Includes: Edit, Set Date, and Set Time
-
 ## Upcoming
 
 ### Main

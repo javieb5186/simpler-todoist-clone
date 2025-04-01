@@ -12,6 +12,7 @@ import Completed from "./components/Main/Completed";
 import Search from "./components/Main/Search";
 import Overdue from "./components/Main/Overdue";
 import UpdateProvider from "./contexts/UpdateProvider";
+import ConfirmModal from "./modals/ConfirmModal";
 
 export interface IndirectData {
   category?: string;
@@ -54,7 +55,7 @@ const ModalChild = () => {
           setIndirectData={setIndirectData}
         />
       )}
-      {modal.search && <SearchModal />}
+      {modal.confirmOptions && <ConfirmModal main={main} setMain={setMain} />}
     </>
   );
 };
