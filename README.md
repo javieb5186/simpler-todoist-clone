@@ -6,6 +6,41 @@ A clean and responsive to-do list app inspired by Todoist, built for learning an
 
 > This project is a simplified clone for educational purposes only. Please support the original app at [Todist.com](https://www.todoist.com/).
 
+## Quick Preview
+
+### Task Creation
+
+Create tasks in:
+
+- The always available add task button in sidebar
+- In Todays task
+- In Upcoming tasks, a view of all tasks for a given week
+- Or in any category selected
+  
+![todoist-task-creation](https://github.com/user-attachments/assets/2e6ec220-4c32-43b8-8ad0-afa6e1b61409)
+
+### Keyword search
+
+Search for keywords in the title or description of a task.
+
+Keywords are also saved as button in case you need to search again for the keyword later. Saved by session.
+
+![todist-create-and-search-task](https://github.com/user-attachments/assets/13382f14-28a3-4286-b29b-d668a637249d)
+
+### Completing a task
+
+All interactive tasks can completed by checkmarking it. They will be moved into completed with a timestamp for completion and will be removed the next day.
+
+![todoist-complete-task](https://github.com/user-attachments/assets/89abea0b-5237-4ef5-b0c6-8fe8b9489dd2)
+
+### Expired Tasks
+
+Tasks past due by date will be moved into overdue.
+
+![todoist-overdue](https://github.com/user-attachments/assets/8d2acfdd-580f-435b-a286-75d09014ec0d)
+
+### 
+
 ## Tech Stack
 
 - React – UI component architecture
