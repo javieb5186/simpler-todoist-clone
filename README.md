@@ -8,6 +8,8 @@ A clean and responsive to-do list app inspired by Todoist, built for learning an
 
 ## Quick Preview
 
+Checkout live website at: [Todoist Clone Vercel App](https://simpler-todoist-clone.vercel.app/)
+
 ### Task Creation
 
 Create tasks in:
